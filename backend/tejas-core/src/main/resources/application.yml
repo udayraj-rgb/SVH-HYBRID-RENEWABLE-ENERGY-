@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: tejas-core
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/tejasdb}
+    username: ${DB_USER:tejas}
+    password: ${DB_PASS:tejas123}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+influxdb:
+  url: ${INFLUX_URL:http://localhost:8086}
+  token: ${INFLUX_TOKEN:tejas-influx-token-super-secret}
+  org: ${INFLUX_ORG:tejas-org}
+  bucket: ${INFLUX_BUCKET:campus-telemetry}
+
+twilio:
+  account-sid: ${TWILIO_SID:ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+  auth-token: ${TWILIO_TOKEN:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+  from-number: ${TWILIO_FROM:whatsapp:+14155238886}
+  stub-mode: ${TWILIO_STUB:true}
+
+energy:
+  tariff-rate-inr-per-kwh: 7.50
+  carbon-factor-kg-per-kwh: 0.82
+  campus-load-threshold-kw: 400.0
+  battery-critical-reserve-percent: 30.0
+
+demo:
+  enabled: true

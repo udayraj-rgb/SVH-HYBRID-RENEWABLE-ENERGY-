@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+influxdb-client
+httpx
+python-dotenv
+pydantic
+pydantic-settings
+apscheduler
+pytest
+pytest-asyncio

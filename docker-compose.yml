@@ -1,0 +1,145 @@
+services:
+  # ─────────────────────────────────────────────
+  #  PostgreSQL — Relational store
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: tejas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tejasdb
+      POSTGRES_USER: tejas
+      POSTGRES_PASSWORD: tejas123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - tejas-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tejas -d tejasdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────
+  #  InfluxDB — Time-series telemetry store
+  # ─────────────────────────────────────────────
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: tejas-influxdb
+    restart: unless-stopped
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: tejas-admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: tejas-influx-pass
+      DOCKER_INFLUXDB_INIT_ORG: tejas-org
+      DOCKER_INFLUXDB_INIT_BUCKET: campus-telemetry
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: tejas-influx-token-super-secret
+    ports:
+      - "8086:8086"
+    volumes:
+      - influx-data:/var/lib/influxdb2
+    networks:
+      - tejas-net
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────
+  #  tejas-core — Spring Boot API gateway
+  # ─────────────────────────────────────────────
+  tejas-core:
+    build:
+      context: ./backend/tejas-core
+      dockerfile: Dockerfile
+    container_name: tejas-core
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tejasdb
+      SPRING_DATASOURCE_USERNAME: tejas
+      SPRING_DATASOURCE_PASSWORD: tejas123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: tejas-influx-token-super-secret
+      INFLUXDB_ORG: tejas-org
+      INFLUXDB_BUCKET: campus-telemetry
+      TWILIO_ACCOUNT_SID: ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      TWILIO_AUTH_TOKEN: your_twilio_auth_token_here
+      TWILIO_FROM_NUMBER: "+15005550006"
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - tejas-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+
+  # ─────────────────────────────────────────────
+  #  tejas-analytics — FastAPI ML/analytics engine
+  # ─────────────────────────────────────────────
+  tejas-analytics:
+    build:
+      context: ./backend/tejas-analytics
+      dockerfile: Dockerfile
+    container_name: tejas-analytics
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: tejas-influx-token-super-secret
+      INFLUXDB_ORG: tejas-org
+      INFLUXDB_BUCKET: campus-telemetry
+      OPENWEATHER_API_KEY: your_openweather_api_key_here
+      CAMPUS_LATITUDE: "19.0760"
+      CAMPUS_LONGITUDE: "72.8777"
+    networks:
+      - tejas-net
+
+  # ─────────────────────────────────────────────
+  #  tejas-ui — React SPA served via Nginx
+  # ─────────────────────────────────────────────
+  tejas-ui:
+    build:
+      context: ./frontend/tejas-ui
+      dockerfile: Dockerfile
+    container_name: tejas-ui
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      tejas-core:
+        condition: service_healthy
+    networks:
+      - tejas-net
+
+# ─────────────────────────────────────────────
+#  Named Volumes
+# ─────────────────────────────────────────────
+volumes:
+  postgres-data:
+    driver: local
+  influx-data:
+    driver: local
+
+# ─────────────────────────────────────────────
+#  Shared Network
+# ─────────────────────────────────────────────
+networks:
+  tejas-net:
+    driver: bridge
