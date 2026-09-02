@@ -1,231 +1,286 @@
-# TEJAS GRID
+# ⚡ TEJAS GRID — Campus Virtual Power Plant (VPP)
 
-> **AI-Driven Virtual Power Plant for Academic Campuses** -- turning student behaviour into dispatchable demand-response assets.
-
-![Docker](https://img.shields.io/badge/Docker-Compose_v3.8-2496ED?logo=docker&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?logo=springboot&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql&logoColor=white)
-![InfluxDB](https://img.shields.io/badge/InfluxDB-2.7-22ADF6?logo=influxdb&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
-![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)
+> **Autonomous Renewable Energy Orchestration, Predictive AI Yield Forecasting & Behavioral Demand Response for Smart Campuses.**  
+> *Developed for the SMART VIT HACKATHON (SVH) — Hybrid Renewable Energy Track.*
 
 ---
 
-## Architecture
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.5-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)](https://scikit-learn.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![InfluxDB](https://img.shields.io/badge/InfluxDB-2.7-22ADF6?style=for-the-badge&logo=influxdb&logoColor=white)](https://www.influxdata.com)
+[![Twilio](https://img.shields.io/badge/Twilio-WhatsApp_API-F22F46?style=for-the-badge&logo=twilio&logoColor=white)](https://www.twilio.com)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
 
-\                     +--------------------+
-                     |     tejas-ui       |  :3000
-                     |  React + Nginx SPA |
-                     +--------+-----------+
-                              | /api/*  (reverse-proxy)
-                     +--------v-----------+
-                     |    tejas-core      |  :8080
-                     |  Spring Boot REST  |
-                     +----+----------+----+
-                          |          |
-           +--------------+          +--------------+
-           |                                        |
-+----------v----------+              +--------------v-------+
-|      postgres        |             |       influxdb        |
-|  PostgreSQL 15 (DDL) |  :5432      |  InfluxDB 2.7 TSDB   |  :8086
-|  tejasdb schema      |             |  campus-telemetry     |
-+---------------------+              +----------+-----------+
-                                                |
-                                    +-----------v-----------+
-                                    |   tejas-analytics     |  :8000
-                                    |  FastAPI + ML Engine  |
-                                    +-----------------------+
-
-External:  Twilio WhatsApp API  |  OpenWeatherMap API
-\
 ---
 
-## Quick Start
+## 📌 Executive Summary
+
+**TEJAS GRID** is an enterprise-grade Virtual Power Plant (VPP) designed to transition university campuses from passive energy consumers into active, dispatchable energy prosumers. 
+
+By unifying **1,200 kW Rooftop Solar PV**, **Wind Micro-Turbines**, **Battery Energy Storage Systems (BESS)**, and **Hostel Demand Response**, TEJAS GRID maintains grid stability during sudden weather anomalies while gamifying energy conservation for thousands of student residents.
+
+---
+
+## 🏛️ System Architecture
+
+```text
+                               +------------------------------------------+
+                               |     TEJAS SCADA MISSION CONTROL UI       |
+                               |          React 18 + Vite + Tailwind      |
+                               |                 Port :3000               |
+                               +--------------------+---------------------+
+                                                    |
+                         +--------------------------+--------------------------+
+                         | CORS Enabled                                        | CORS Enabled
+                         v                                                     v
+       +------------------------------------+                +------------------------------------+
+       |      tejas-telemetry-service       |                |      tejas-core-orchestrator       |
+       |        FastAPI + Python 3.11       |                |     Java 17 + Spring Boot 3.3.3    |
+       |             Port :8000             |                |             Port :8080             |
+       +-----------------+------------------+                +-----------------+------------------+
+                         |                                                     |
+         +---------------+---------------+                     +---------------+---------------+
+         |                               |                     |                               |
+         v                               v                     v                               v
++------------------+           +------------------+   +------------------+           +------------------+
+|  InfluxDB 2.7    |           |  Predictive AI   |   |  PostgreSQL 15   |           |  Twilio WhatsApp |
+|  TSDB Bucket:    |           |  Scikit-Learn    |   |  Relational DB:  |           |  Automated       |
+|  campus_telemetry|           |  RandomForest 24h|   |  tejas_grid_db   |           |  Green Hour      |
+|  Port :8086      |           |  PV Yield Model  |   |  Port :5432      |           |  Nudges          |
++------------------+           +------------------+   +------------------+           +------------------+
+```
+
+---
+
+## 🚀 Key Features
+
+### 1. ⚡ Real-Time Campus Telemetry Stream
+- Generates 5-second asynchronous telemetry samples modeling solar irradiance, wind gusts, academic load curves, and Battery State of Charge (SoC).
+- High-throughput ingestion into **InfluxDB 2.7** with sub-second Flux query retrieval.
+- Interactive anomaly simulation: simulates instant 65% solar drop caused by rapid cloud cover events.
+
+### 2. 🤖 24-Hour Predictive AI Yield Engine
+- Machine learning model powered by **Scikit-Learn (`RandomForestRegressor`)** trained on photovoltaic conversion physics, diurnal solar curves, and temperature derating.
+- Integrates with **OpenWeatherMap 5-Day/3-Hour Forecast API** with autonomous diurnal synthetic fallbacks.
+- Strictly enforces physical nighttime cutoff ($0.0\text{ kW}$ between 20:00 and 05:00) and calculates peak deficit hours, max deficit kW, and deficit risk flags.
+
+### 3. 🛡️ Deterministic 30% Critical Lab Reserve Lock
+- When campus deficit spikes $> 150\text{ kW}$ or solar generation drops $> 40\%$, the orchestrator calculates optimal battery discharge ($\min(\text{deficit}, 250\text{ kW})$).
+- **Core Safety Rule**: If battery $\text{SoC} \le 30.0\%$, battery discharge is strictly locked to **$0.0\text{ kW}$** (`criticalReserveLocked = true`) to safeguard mission-critical research servers and lab equipment from power failure.
+- Automatically generates demand-side water pumping shift recommendations ($-60\text{ kW}$) and calculates peak tariff cost avoidance ($₹12.50/\text{kWh}$).
+
+### 4. 📲 Behavioral Demand-Response (Twilio WhatsApp Pipeline)
+- Automatic broadcast of **"Green Hour"** nudges to opted-in student residents during active grid deficits.
+- Features resilient mock fallback: safely logs dispatches without breaking transactions if API credentials are unconfigured.
+- Dynamic student opt-in toggle endpoint to manage notification preferences.
+
+### 5. 🏆 Gamification & Hostel Leaderboard
+- Students earn **+50 Karma points** for participating in Green Hour load shifts.
+- Hostels (*Block A - Aryabhata*, *Block B - Bhaskara*, *Block C - Charaka*) ranked live by cumulative kWh energy savings and aggregated karma.
+
+---
+
+## 📁 Repository Structure
+
+```text
+D:\tejas-grid\
+├── tejas-core-orchestrator/           # Phase 3, 4 & 5: Spring Boot 3 Core Service (:8080)
+│   ├── pom.xml                        # Dependencies: Web, JPA, PostgreSQL, Twilio, Validation
+│   ├── mvnw / mvnw.cmd                # Maven Wrapper (Java 17+)
+│   └── src/main/
+│       ├── java/com/tejas/orchestrator/
+│       │   ├── TejasOrchestratorApplication.java
+│       │   ├── config/                # CorsConfig, DataInitializer, RestTemplateConfig
+│       │   ├── entity/                # HostelBlock, Student, DispatchEvent
+│       │   ├── repository/            # Spring Data JPA Repositories
+│       │   ├── dto/                   # TelemetryDto, OrchestratorStatusResponse, LeaderboardResponse
+│       │   ├── service/               # OrchestrationService (Safety Engine), TwilioAlertService
+│       │   └── controller/            # OrchestratorController, GamificationController, StudentController, HealthController
+│       └── resources/
+│           └── application.properties # PostgreSQL, FastAPI URL, Twilio Credentials
+│
+├── tejas-telemetry-service/           # Phase 1 & 2: FastAPI Telemetry & AI Microservice (:8000)
+│   ├── docker-compose.yml             # PostgreSQL 15 & InfluxDB 2.7 Multi-Container Setup
+│   ├── requirements.txt               # FastAPI, Uvicorn, InfluxDB-Client, Scikit-Learn, Requests
+│   └── app/
+│       ├── database.py                # InfluxDB client connection & health check
+│       ├── telemetry_generator.py     # 5s asynchronous ingestion loop & anomaly simulation
+│       ├── ml_engine.py               # Scikit-Learn 24h Predictive Yield & OpenWeather Predictor
+│       └── main.py                    # REST API routes, CORS & Lifespan handlers
+│
+├── frontend/                          # SCADA Mission Control Dashboard (:3000)
+│   └── tejas-ui/                      # React 18 + Vite + Tailwind CSS SPA
+│       ├── src/                       # KpiCards, Mission Control Charts, Leaderboards, Dispatch Alerts
+│       └── package.json
+│
+├── infra/                             # Database initialization scripts
+│   └── init.sql                       # PostgreSQL schema definitions & seeds
+├── docker-compose.yml                 # Root multi-tier container orchestration
+├── .gitignore                         # Configured for Java/Maven, Python/Venv, and Node
+└── README.md                          # Project Documentation
+```
+
+---
+
+## 🛠️ Getting Started
 
 ### Prerequisites
-- Docker Desktop >= 24.x
-- Docker Compose >= 2.x
+- **Java 17+** (JDK installed and configured on PATH)
+- **Python 3.10+** (with `pip` and virtual environment support)
+- **Docker Desktop** (running Linux containers)
+- **Node.js 18+** (for frontend development)
 
-### 1. Clone the repository
-\\ash
-git clone https://github.com/your-org/tejas-grid.git
-cd tejas-grid
-\
-### 2. Configure secrets (optional for local dev)
-All environment variables have safe stub defaults. For real deployments copy \.env.example\ to \.env\ and fill in real values.
-
-### 3. Launch the full stack
-\\ash
-docker-compose up --build -d
-\
-### 4. Verify services
-
-| Service          | URL                           | Notes                    |
-|------------------|-------------------------------|--------------------------|
-| tejas-ui         | http://localhost:3000         | React dashboard          |
-| tejas-core       | http://localhost:8080/actuator| Spring Boot health check |
-| tejas-analytics  | http://localhost:8000/docs    | FastAPI Swagger UI       |
-| InfluxDB Console | http://localhost:8086         | Login: tejas-admin       |
-| PostgreSQL       | localhost:5432                | DB: tejasdb user: tejas  |
-
-### 5. Tear down
-\\ash
-docker-compose down -v   # -v also removes named volumes
-\
 ---
 
-## Environment Variables Reference
+### 1. Start Database Infrastructure (Docker)
 
-### tejas-core (Spring Boot)
+```powershell
+cd D:\tejas-grid\tejas-telemetry-service
+docker compose up -d
+```
 
-| Variable | Default / Stub | Description |
+Verify containers are running:
+```powershell
+docker ps
+```
+- **PostgreSQL 15**: Port `5432` (`tejas_grid_db`, user: `tejas_admin`, password: `tejas_secure_pass`)
+- **InfluxDB 2.7**: Port `8086` (`campus_telemetry` bucket, org: `tejas_grid_org`)
+
+---
+
+### 2. Start FastAPI Telemetry & Predictive AI Service (Port 8000)
+
+```powershell
+cd D:\tejas-grid\tejas-telemetry-service
+
+# Activate Python Virtual Environment
+.\.venv\Scripts\activate
+
+# Launch Service
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+- **Interactive Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
+
+---
+
+### 3. Start Spring Boot Core Orchestrator (Port 8080)
+
+```powershell
+cd D:\tejas-grid\tejas-core-orchestrator
+
+# Run via Maven Wrapper
+.\mvnw.cmd spring-boot:run
+
+# OR run the pre-built JAR:
+java -jar target\tejas-core-orchestrator-1.0.0.jar
+```
+- **Health Check**: [http://localhost:8080/health](http://localhost:8080/health)
+- **Orchestrator Live Status**: [http://localhost:8080/api/v1/orchestrator/status](http://localhost:8080/api/v1/orchestrator/status)
+
+---
+
+### 4. Start Frontend SCADA UI (Port 3000)
+
+```powershell
+cd D:\tejas-grid\frontend\tejas-ui
+npm install
+npm run dev
+```
+- **Web App**: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 📡 Complete API Reference
+
+### Core Orchestrator API (`http://localhost:8080`)
+
+| Method | Endpoint | Description |
 |---|---|---|
-| SPRING_DATASOURCE_URL | jdbc:postgresql://postgres:5432/tejasdb | PostgreSQL JDBC URL |
-| SPRING_DATASOURCE_USERNAME | tejas | DB username |
-| SPRING_DATASOURCE_PASSWORD | tejas123 | DB password |
-| SPRING_JPA_HIBERNATE_DDL_AUTO | validate | Hibernate DDL strategy |
-| INFLUXDB_URL | http://influxdb:8086 | InfluxDB v2 endpoint |
-| INFLUXDB_TOKEN | tejas-influx-token-super-secret | InfluxDB admin token |
-| INFLUXDB_ORG | tejas-org | InfluxDB organisation |
-| INFLUXDB_BUCKET | campus-telemetry | InfluxDB telemetry bucket |
-| TWILIO_ACCOUNT_SID | ACxxx... | Twilio account SID (stub) |
-| TWILIO_AUTH_TOKEN | your_twilio_auth_token_here | Twilio auth token (stub) |
-| TWILIO_FROM_NUMBER | +15005550006 | WhatsApp sender (Twilio sandbox) |
-| SPRING_PROFILES_ACTIVE | docker | Active Spring profile |
+| `GET` | `/health` | Service health, DB connection & FastAPI bridge status |
+| `GET` | `/api/v1/orchestrator/status` | Real-time grid health, deficit calculation & active recommendation |
+| `GET` | `/api/v1/orchestrator/status?simulatedSoc=28.0` | Test deterministic 30% battery safety reserve lock |
+| `POST` | `/api/v1/orchestrator/execute-dispatch` | Confirms dispatch recommendation, credits +50 Karma to students |
+| `GET` | `/api/v1/gamification/leaderboard` | Ranked hostel savings (kWh) and top student contributors |
+| `POST` | `/api/v1/students/{id}/toggle-whatsapp` | Toggles student WhatsApp notification opt-in status |
 
-### tejas-analytics (FastAPI)
+### Telemetry & AI Microservice API (`http://localhost:8000`)
 
-| Variable | Default / Stub | Description |
+| Method | Endpoint | Description |
 |---|---|---|
-| INFLUXDB_URL | http://influxdb:8086 | InfluxDB v2 endpoint |
-| INFLUXDB_TOKEN | tejas-influx-token-super-secret | InfluxDB admin token |
-| INFLUXDB_ORG | tejas-org | InfluxDB organisation |
-| INFLUXDB_BUCKET | campus-telemetry | InfluxDB bucket |
-| OPENWEATHER_API_KEY | your_openweather_api_key_here | OpenWeatherMap API key |
-| CAMPUS_LATITUDE | 19.0760 | Campus latitude (Mumbai) |
-| CAMPUS_LONGITUDE | 72.8777 | Campus longitude (Mumbai) |
+| `GET` | `/health` | Service health, InfluxDB status & ML model readiness |
+| `GET` | `/api/telemetry/live` | Latest real-time campus telemetry data point from InfluxDB |
+| `POST` | `/api/telemetry/simulate-cloud-cover` | Anomaly trigger: drops solar generation instantly by 65% |
+| `POST` | `/api/telemetry/reset` | Resets anomaly simulation back to nominal conditions |
+| `GET` | `/api/ml/forecast/24h` | 24-hour hourly AI yield forecast (solar, wind, load, net balance) |
 
 ---
 
-## API Endpoints Overview
+## 🧪 End-to-End Verification Runbook
 
-### tejas-core REST API (:8080)
+Run these commands in PowerShell to test the full lifecycle:
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | /api/assets | List all campus energy assets |
-| GET | /api/assets/{id} | Get a single asset by UUID |
-| GET | /api/hostels | List hostel blocks with leaderboard data |
-| GET | /api/hostels/{id}/leaderboard | Points leaderboard for a hostel |
-| GET | /api/students | List all registered students |
-| POST | /api/students | Register a new student |
-| GET | /api/students/{id} | Get student profile + karma |
-| POST | /api/dispatch | Trigger a demand-response dispatch event |
-| GET | /api/dispatch | List dispatch history |
-| GET | /api/rewards | List available rewards |
-| POST | /api/rewards/redeem | Redeem a reward (deducts karma points) |
-| GET | /actuator/health | Spring Boot health endpoint |
+```powershell
+# 1. Verify Both Service Health Checks
+curl http://localhost:8000/health
+# Output: {"status":"UP","service":"tejas-telemetry","influxdb":"CONNECTED","ml_engine":"READY"}
 
-### tejas-analytics ML API (:8000)
+curl http://localhost:8080/health
+# Output: {"status":"UP","service":"tejas-orchestrator","database":"CONNECTED","fastapi_bridge":"ACTIVE"}
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | /docs | Swagger UI (auto-generated) |
-| GET | /health | Service health check |
-| GET | /forecast/solar | Solar irradiance forecast (next 24h) |
-| GET | /forecast/load | Campus load demand forecast |
-| GET | /telemetry/summary | Real-time telemetry from InfluxDB |
-| POST | /dispatch/recommend | AI recommendation for next dispatch window |
-| GET | /gamification/scores | Aggregated scores by hostel |
+# 2. Query 24-Hour ML Predictive Yield Forecast
+curl http://localhost:8000/api/ml/forecast/24h
 
----
+# 3. Simulate Sudden Cloud Cover Anomaly (65% Solar Drop)
+curl -X POST http://localhost:8000/api/telemetry/simulate-cloud-cover
 
-## Demo Scenarios
+# 4. Observe Orchestrator Detect Deficit & Dispatch Green Hour Alerts
+curl http://localhost:8080/api/v1/orchestrator/status
 
-### Scenario 1 -- Peak-Demand Dispatch
-1. Analytics engine detects campus load approaching 400 kW between 18:00-20:00.
-2. A DISPATCH event is created via POST /api/dispatch with event_type=PEAK_SHAVING.
-3. tejas-core sends WhatsApp push notifications to opted-in students via Twilio.
-4. Students reduce non-essential loads (AC, EV charging).
-5. Each participating hostel earns karma points; leaderboard updates in real time.
+# 5. Verify 30% Battery Safety Reserve Lock (Simulated SoC <= 30%)
+curl "http://localhost:8080/api/v1/orchestrator/status?simulatedSoc=24.5"
+# Response guarantees: "batteryDischargeKw": 0.0, "criticalReserveLocked": true
 
-### Scenario 2 -- Solar Surplus BESS Charge
-1. Morning solar generation exceeds campus load by 120 kW.
-2. Analytics forecasts continued surplus; recommends BESS charge.
-3. A BESS_CHARGE event is dispatched automatically.
-4. Students see a Green Surplus badge on the dashboard.
+# 6. Execute Dispatch & Award Student Karma Points
+curl -X POST http://localhost:8080/api/v1/orchestrator/execute-dispatch
 
-### Scenario 3 -- Gamification Reward Redemption
-1. Student accumulates 500 karma points by reducing hostel consumption.
-2. Student redeems Movie Night Pass via POST /api/rewards/redeem.
-3. Points are deducted; redemption is logged in redemption_log.
-4. Student receives WhatsApp confirmation.
+# 7. Check Gamification Leaderboard Updates
+curl http://localhost:8080/api/v1/gamification/leaderboard
+
+# 8. Reset Telemetry Simulation to Nominal
+curl -X POST http://localhost:8000/api/telemetry/reset
+```
 
 ---
 
-## Database Schema
+## ⚙️ Configuration & Environment Variables
 
-\campus_asset    -- Physical generation/storage assets (Solar, Wind, BESS)
-hostel_block    -- Residential blocks with aggregate points and savings
-student_profile -- Individual student + karma + opt-in status
-dispatch_event  -- VPP demand-response dispatch history
-reward          -- Reward catalogue (Wi-Fi tokens, vouchers, etc.)
-redemption_log  -- Point-spend audit trail per student
-\
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React 18, Vite, Nginx |
-| API Gateway | Spring Boot 3 (Java 21), Spring Data JPA |
-| Analytics Engine | FastAPI 0.111 (Python 3.11), uvicorn |
-| Relational DB | PostgreSQL 15 (uuid-ossp, TimestampTZ) |
-| Time-Series DB | InfluxDB 2.7 (Flux query language) |
-| Messaging | Twilio WhatsApp Business API |
-| Weather Data | OpenWeatherMap One Call API 3.0 |
-| Containerisation | Docker Compose 3.8, multi-stage builds |
+| Variable | Service | Default / Fallback | Description |
+|---|---|---|---|
+| `POSTGRES_DB` | Docker / Spring | `tejas_grid_db` | PostgreSQL Database Name |
+| `POSTGRES_USER` | Docker / Spring | `tejas_admin` | Database Superuser |
+| `POSTGRES_PASSWORD` | Docker / Spring | `tejas_secure_pass` | Database Password |
+| `INFLUXDB_TOKEN` | Docker / FastAPI | `tejas_super_secret_influx_token_2026` | InfluxDB API Admin Token |
+| `INFLUXDB_BUCKET` | Docker / FastAPI | `campus_telemetry` | Time-Series Telemetry Bucket |
+| `FASTAPI_SERVICE_URL`| Spring Boot | `http://localhost:8000` | Bridge URL to FastAPI ML Service |
+| `TWILIO_ACCOUNT_SID` | Spring Boot | `AC_MOCK_SID` | Twilio Account SID (auto-mock fallback) |
+| `TWILIO_AUTH_TOKEN`  | Spring Boot | `mock_token` | Twilio Auth Token (auto-mock fallback) |
+| `TWILIO_WHATSAPP_FROM` | Spring Boot | `whatsapp:+14155238886` | Twilio WhatsApp Sandbox Sender |
+| `OPENWEATHER_API_KEY`| FastAPI | `""` | OpenWeatherMap Key (synthetic fallback) |
 
 ---
 
-## Project Structure
+## 🏆 Presentation & Pitch Deck
 
-\tejas-grid/
-+-- docker-compose.yml         # Full-stack orchestration
-+-- README.md
-+-- infra/
-|   +-- init.sql               # PostgreSQL DDL + seed data
-+-- backend/
-|   +-- tejas-core/            # Spring Boot service
-|   |   +-- Dockerfile
-|   |   +-- pom.xml
-|   |   +-- src/
-|   +-- tejas-analytics/       # FastAPI ML engine
-|       +-- Dockerfile
-|       +-- requirements.txt
-|       +-- main.py
-+-- frontend/
-    +-- tejas-ui/              # React + Vite SPA
-        +-- Dockerfile
-        +-- nginx.conf
-        +-- package.json
-        +-- src/
-\
----
-
-## Contributing
-
-1. Create a feature branch: git checkout -b feat/your-feature
-2. Follow conventional commits: feat:, fix:, docs:, chore:
-3. Open a pull request -- CI will run lint and tests automatically.
+- Project documentation and hackathon pitch slides are preserved in [`svh.pptx - Google Slides.pdf.png`](./svh.pptx%20-%20Google%20Slides.pdf.png).
 
 ---
 
-## License
+## 📄 License
 
-MIT License -- see LICENSE for details.
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
-> Built with love for a greener campus.
+> *Built with pride for a smarter, sustainable, and self-sufficient campus grid.*
