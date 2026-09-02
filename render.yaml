@@ -1,0 +1,59 @@
+databases:
+  - name: tejas-postgres
+    databaseName: tejas_grid_db
+    user: tejas_admin
+    plan: free
+    region: oregon
+
+services:
+  # 1. FastAPI Telemetry & Predictive AI Microservice
+  - type: web
+    name: tejas-telemetry
+    env: docker
+    dockerfilePath: tejas-telemetry-service/Dockerfile
+    dockerContext: tejas-telemetry-service
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+
+  # 2. Spring Boot Core Orchestrator
+  - type: web
+    name: tejas-orchestrator
+    env: docker
+    dockerfilePath: tejas-core-orchestrator/Dockerfile
+    dockerContext: tejas-core-orchestrator
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: tejas-postgres
+          property: connectionString
+      - key: FASTAPI_SERVICE_URL
+        fromService:
+          name: tejas-telemetry
+          type: web
+          property: host
+
+  # 3. WhatsApp Companion Dispatcher
+  - type: web
+    name: tejas-whatsapp-gateway
+    env: docker
+    dockerfilePath: whatsapp-gateway/Dockerfile
+    dockerContext: whatsapp-gateway
+    plan: free
+    region: oregon
+    healthCheckPath: /api/status
+
+  # 4. React SCADA Mission Control Dashboard
+  - type: web
+    name: tejas-scada-ui
+    env: static
+    rootDir: frontend/tejas-ui
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

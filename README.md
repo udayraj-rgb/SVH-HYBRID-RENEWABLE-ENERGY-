@@ -259,6 +259,25 @@ Use the bottom **Demo Toolbar** on `http://localhost:3000` to simulate real-worl
 
 ---
 
+## ☁️ Deploying on Render (1-Click Blueprint)
+
+You can deploy the complete TEJAS GRID multi-tier architecture to **[Render.com](https://render.com)** for free using the included `render.yaml` blueprint:
+
+1. **Push your code to GitHub**: Ensure all latest code is in your GitHub repository.
+2. **Log into Render**: Go to [dashboard.render.com](https://dashboard.render.com).
+3. **Deploy Blueprint**:
+   - Click **New +** $\rightarrow$ **Blueprint**.
+   - Connect your GitHub repository: `udayraj-rgb/SVH-HYBRID-RENEWABLE-ENERGY-`.
+   - Render will automatically detect `render.yaml` and provision:
+     - **PostgreSQL 15 Database** (`tejas_grid_db`)
+     - **FastAPI Telemetry & AI Web Service** (`tejas-telemetry`)
+     - **Spring Boot Core Orchestrator** (`tejas-orchestrator`)
+     - **WhatsApp Companion Gateway** (`tejas-whatsapp-gateway`)
+     - **React SCADA Mission Control** (`tejas-scada-ui`)
+4. Click **Apply** — Render builds and connects everything with zero manual wiring!
+
+---
+
 ## 📄 License
 
 Distributed under the **MIT License**.
