@@ -15,6 +15,9 @@ public class Student {
     private String name;
 
     @Column(nullable = false)
+    private String registrationNumber;
+
+    @Column(nullable = false)
     private String phoneNumber;
 
     @Column(nullable = false, unique = true)
@@ -34,9 +37,10 @@ public class Student {
     public Student() {
     }
 
-    public Student(Long id, String name, String phoneNumber, String email, Integer karmaPoints, Boolean whatsappOptIn, HostelBlock hostel) {
+    public Student(Long id, String name, String registrationNumber, String phoneNumber, String email, Integer karmaPoints, Boolean whatsappOptIn, HostelBlock hostel) {
         this.id = id;
         this.name = name;
+        this.registrationNumber = registrationNumber;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.karmaPoints = karmaPoints;
@@ -51,6 +55,7 @@ public class Student {
     public static class Builder {
         private Long id;
         private String name;
+        private String registrationNumber;
         private String phoneNumber;
         private String email;
         private Integer karmaPoints;
@@ -59,6 +64,7 @@ public class Student {
 
         public Builder id(Long id) { this.id = id; return this; }
         public Builder name(String name) { this.name = name; return this; }
+        public Builder registrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; return this; }
         public Builder phoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; return this; }
         public Builder email(String email) { this.email = email; return this; }
         public Builder karmaPoints(Integer karmaPoints) { this.karmaPoints = karmaPoints; return this; }
@@ -66,7 +72,7 @@ public class Student {
         public Builder hostel(HostelBlock hostel) { this.hostel = hostel; return this; }
 
         public Student build() {
-            return new Student(id, name, phoneNumber, email, karmaPoints, whatsappOptIn, hostel);
+            return new Student(id, name, registrationNumber, phoneNumber, email, karmaPoints, whatsappOptIn, hostel);
         }
     }
 
@@ -75,6 +81,9 @@ public class Student {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getRegistrationNumber() { return registrationNumber; }
+    public void setRegistrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; }
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }

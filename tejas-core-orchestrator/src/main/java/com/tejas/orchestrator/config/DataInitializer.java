@@ -26,8 +26,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // Ensure hostels exist
         if (hostelBlockRepository.count() == 0) {
-            log.info("Seeding initial TEJAS GRID hostel blocks and students...");
+            log.info("Seeding initial TEJAS GRID hostel blocks...");
 
             HostelBlock blockA = HostelBlock.builder()
                     .name("Block A (Aryabhata)")
@@ -53,59 +54,49 @@ public class DataInitializer implements CommandLineRunner {
                     .rank(3)
                     .build();
 
-            List<HostelBlock> savedHostels = hostelBlockRepository.saveAll(List.of(blockA, blockB, blockC));
-
-            HostelBlock hA = savedHostels.get(0);
-            HostelBlock hB = savedHostels.get(1);
-            HostelBlock hC = savedHostels.get(2);
-
-            List<Student> students = List.of(
-                    Student.builder()
-                            .name("Aarav Sharma")
-                            .phoneNumber("+919876543210")
-                            .email("aarav.s@campus.tejas.edu")
-                            .karmaPoints(420)
-                            .whatsappOptIn(true)
-                            .hostel(hA)
-                            .build(),
-                    Student.builder()
-                            .name("Priya Patel")
-                            .phoneNumber("+919876543211")
-                            .email("priya.p@campus.tejas.edu")
-                            .karmaPoints(380)
-                            .whatsappOptIn(true)
-                            .hostel(hB)
-                            .build(),
-                    Student.builder()
-                            .name("Rohan Verma")
-                            .phoneNumber("+919876543212")
-                            .email("rohan.v@campus.tejas.edu")
-                            .karmaPoints(310)
-                            .whatsappOptIn(false)
-                            .hostel(hA)
-                            .build(),
-                    Student.builder()
-                            .name("Ananya Iyer")
-                            .phoneNumber("+919876543213")
-                            .email("ananya.i@campus.tejas.edu")
-                            .karmaPoints(290)
-                            .whatsappOptIn(true)
-                            .hostel(hC)
-                            .build(),
-                    Student.builder()
-                            .name("Vikram Singh")
-                            .phoneNumber("+919876543214")
-                            .email("vikram.s@campus.tejas.edu")
-                            .karmaPoints(260)
-                            .whatsappOptIn(true)
-                            .hostel(hB)
-                            .build()
-            );
-
-            studentRepository.saveAll(students);
-            log.info("Successfully seeded 3 hostels and 5 students into PostgreSQL.");
-        } else {
-            log.info("PostgreSQL database already contains hostel and student records. Skipping seed.");
+            hostelBlockRepository.saveAll(List.of(blockA, blockB, blockC));
         }
+
+        List<HostelBlock> hostels = hostelBlockRepository.findAll();
+        HostelBlock hA = hostels.get(0);
+        HostelBlock hB = hostels.size() > 1 ? hostels.get(1) : hA;
+        HostelBlock hC = hostels.size() > 2 ? hostels.get(2) : hA;
+
+        // Ensure real testing number and student records with registration numbers are present
+        boolean testUserExists = studentRepository.findAll().stream()
+                .anyMatch(s -> "+918238893551".equals(s.getPhoneNumber()) || "8238893551".equals(s.getPhoneNumber()));
+
+        if (!testUserExists) {
+            log.info("Registering real test student (+918238893551) with hostel registration...");
+
+            Student udayraj = Student.builder()
+                    .name("Udayraj")
+                    .registrationNumber("24BCE1082")
+                    .phoneNumber("+918238893551")
+                    .email("udayraj@campus.tejas.edu")
+                    .karmaPoints(550)
+                    .whatsappOptIn(true)
+                    .hostel(hA)
+                    .build();
+
+            studentRepository.save(udayraj);
+        }
+
+        // Backfill registration numbers for any existing legacy student rows
+        List<Student> allStudents = studentRepository.findAll();
+        boolean updated = false;
+        String[] sampleRegs = {"24BCE1001", "24BEE1045", "24BME1078", "24BIT1012", "24BCE1090", "24BCE1082"};
+        for (int i = 0; i < allStudents.size(); i++) {
+            Student s = allStudents.get(i);
+            if (s.getRegistrationNumber() == null || s.getRegistrationNumber().isBlank()) {
+                s.setRegistrationNumber(sampleRegs[i % sampleRegs.length]);
+                updated = true;
+            }
+        }
+        if (updated) {
+            studentRepository.saveAll(allStudents);
+        }
+
+        log.info("Student directory initialized: {} active students in PostgreSQL.", studentRepository.count());
     }
 }

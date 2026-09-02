@@ -36,6 +36,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# WhatsApp Gateway Auth & Credentials
+auth_info_baileys/
+whatsapp-gateway/auth_info_baileys/
+
 # IDE & Editor files
 .idea/
 .vscode/
