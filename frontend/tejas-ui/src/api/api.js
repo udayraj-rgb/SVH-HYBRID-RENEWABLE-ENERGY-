@@ -141,7 +141,7 @@ export const triggerDemoScenario = async (scenario) => {
       // Trigger automatic WhatsApp deficit dispatch directly to student inboxes
       try {
         await axios.post('http://localhost:5001/api/broadcast', {
-          phones: ['918238893551', '919834031115'],
+          phones: ['918238893551', '919834031115', '919031717980'],
           message: '⚡ TEJAS GRID LIVE ALERT: Solar deficit of 184.2 kW detected on campus! Green Hour is now ACTIVE in Block A (Aryabhata). Please turn off AC/heaters to earn +50 Karma Points!'
         });
       } catch (err) {
