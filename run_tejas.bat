@@ -1,10 +1,29 @@
 @echo off
-title TEJAS GRID - Multi-Tier Launcher
+title TEJAS GRID - 1-Click Multi-Tier Launcher
 color 0b
 
 echo ==========================================================
-echo        TEJAS GRID VIRTUAL POWER PLANT LAUNCHER
+echo        ⚡ TEJAS GRID VIRTUAL POWER PLANT LAUNCHER ⚡
 echo ==========================================================
+
+:: 0. Check & Launch Docker Desktop if not running
+docker info >nul 2>&1
+if %errorlevel% neq 0 (
+    echo.
+    echo [*] Docker is not running. Starting Docker Desktop automatically...
+    if exist "C:\Users\UDAYRAJ\AppData\Local\Programs\DockerDesktop\Docker Desktop.exe" (
+        start "" "C:\Users\UDAYRAJ\AppData\Local\Programs\DockerDesktop\Docker Desktop.exe"
+    )
+    echo [*] Waiting for Docker Engine to initialize...
+    :wait_docker
+    timeout /t 3 /nobreak >nul
+    docker info >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo     ...still waiting for Docker to start...
+        goto wait_docker
+    )
+    echo [*] Docker Engine is ready!
+)
 
 :: 1. Start Docker Databases
 echo.
@@ -34,13 +53,13 @@ start "TEJAS - SCADA Dashboard (Port 3000)" cmd /k "cd /d D:\tejas-grid\frontend
 
 echo.
 echo ==========================================================
-echo  All 5 TEJAS GRID services have been launched!
+echo  ✅ All 5 TEJAS GRID services have been launched!
 echo ==========================================================
-echo  SCADA Dashboard:    http://localhost:3000
-echo  WhatsApp QR Portal: http://localhost:5001
-echo  Spring Boot Status: http://localhost:8080/api/v1/orchestrator/status
-echo  FastAPI Docs:       http://localhost:8000/docs
-echo  InfluxDB Console:   http://localhost:8086
+echo  • SCADA Mission Control:  http://localhost:3000
+echo  • WhatsApp QR Portal:     http://localhost:5001
+echo  • Spring Boot Status:     http://localhost:8080/api/v1/orchestrator/status
+echo  • FastAPI Swagger Docs:   http://localhost:8000/docs
+echo  • InfluxDB Dashboard:     http://localhost:8086
 echo ==========================================================
 echo.
 pause
