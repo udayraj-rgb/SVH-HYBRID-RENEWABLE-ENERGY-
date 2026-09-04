@@ -6,6 +6,7 @@ import {
   createStudent,
   updateStudent,
   deleteStudent,
+  redeemStudentPoints,
   sendDirectDeficitAlert,
   sendWhatsAppMessage,
   getKpis,
@@ -36,10 +37,10 @@ import {
 } from 'lucide-react';
 
 export default function StudentPortal() {
-  const { user, isOperator, isStudent } = useAuth();
+  const { user, updateUser, isOperator, isStudent } = useAuth();
   const [rewards, setRewards] = useState([]);
   const [studentList, setStudentList] = useState([]);
-  const [karmaBalance, setKarmaBalance] = useState(user?.karmaPoints || 870);
+  const [karmaBalance, setKarmaBalance] = useState(user?.karmaPoints || 1170);
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [alertSuccess, setAlertSuccess] = useState(null);
   const [redeemSuccess, setRedeemSuccess] = useState(null);
@@ -71,12 +72,12 @@ export default function StudentPortal() {
 
   const currentUser = isStudent()
     ? {
-        name: user.name,
-        registrationNumber: user.registrationNumber || '24BCE1082',
-        hostel: user.hostel || 'Block A (Aryabhata)',
-        phoneNumber: user.phoneNumber || '+91 82388 93551',
-        cleanNumber: user.cleanNumber || '918238893551',
-        badge: user.badge || 'GREEN GUARDIAN',
+        name: user?.name || 'Udayraj',
+        registrationNumber: user?.registrationNumber || '24BCE1082',
+        hostel: user?.hostel || 'Block A (Aryabhata)',
+        phoneNumber: user?.phoneNumber || '+91 82388 93551',
+        cleanNumber: user?.cleanNumber || '918238893551',
+        badge: user?.badge || 'ENERGY CHAMPION',
       }
     : {
         name: 'Udayraj',
@@ -96,50 +97,93 @@ export default function StudentPortal() {
       ]);
 
       if (rewardRes && rewardRes.data) setRewards(rewardRes.data);
-      if (students && Array.isArray(students)) setStudentList(students);
+      if (students && Array.isArray(students)) {
+        setStudentList(students);
+
+        // Synchronize active student's Karma points directly from PostgreSQL database
+        const reg = currentUser.registrationNumber;
+        const cleanPh = (currentUser.cleanNumber || '').replace(/[^0-9]/g, '');
+        const matchedStudent = students.find(
+          (s) => s.registrationNumber === reg ||
+                (s.phoneNumber && s.phoneNumber.replace(/[^0-9]/g, '').includes(cleanPh))
+        );
+
+        if (matchedStudent && typeof matchedStudent.karmaPoints === 'number') {
+          setKarmaBalance(matchedStudent.karmaPoints);
+          if (updateUser) {
+            updateUser({ karmaPoints: matchedStudent.karmaPoints, id: matchedStudent.id });
+          }
+        }
+      }
+
       if (kpis && kpis.data && kpis.data.deficit_kw) {
         setCurrentDeficit(kpis.data.deficit_kw || 180.4);
       }
     } catch (e) {
-      console.error(e);
+      console.error('Error loading portal data:', e);
     }
   };
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 8000);
+    const interval = setInterval(loadData, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const handleRedeem = async (reward) => {
     if (karmaBalance < reward.pointsCost) return;
 
-    const voucherCode = `TEJAS-${Math.floor(1000 + Math.random() * 9000)}`;
-    const newBalance = karmaBalance - reward.pointsCost;
-    setKarmaBalance(newBalance);
+    // Locate student ID in database
+    const reg = currentUser.registrationNumber;
+    const cleanPh = (currentUser.cleanNumber || '').replace(/[^0-9]/g, '');
+    const matched = studentList.find(
+      (s) => s.registrationNumber === reg ||
+            (s.phoneNumber && s.phoneNumber.replace(/[^0-9]/g, '').includes(cleanPh))
+    );
+    const targetStudentId = matched ? matched.id : (user?.id || 1);
 
-    const voucherMsg = `🎉 *TEJAS GRID VOUCHER CONFIRMATION*\n\nCongratulations *${currentUser.name}*!\nYou successfully redeemed *"${reward.name}"* for ${reward.pointsCost} Karma Points.\n\n🎟️ *Voucher Code:* ${voucherCode}\n📍 *Redeem Location:* Central Campus Cafeteria / Academic Admin\n💰 *Remaining Karma:* ${newBalance} KP\n\n⚡ _Thank you for reducing electricity load during Green Hours to keep TEJAS GRID balanced!_`;
+    let updatedBalance = karmaBalance - reward.pointsCost;
+
+    // 1. Physically decrement Karma points in PostgreSQL database
+    try {
+      const dbResult = await redeemStudentPoints(targetStudentId, reward.pointsCost, reward.name);
+      if (dbResult && typeof dbResult.currentBalance === 'number') {
+        updatedBalance = dbResult.currentBalance;
+      }
+    } catch (dbErr) {
+      console.warn('PostgreSQL Karma deduction failed, using calculated balance:', dbErr.message);
+    }
+
+    // 2. Update local state and persistent AuthContext user
+    setKarmaBalance(updatedBalance);
+    if (updateUser) {
+      updateUser({ karmaPoints: updatedBalance });
+    }
+
+    // 3. Immediately refresh studentList so Student Directory table reflects new balance
+    await loadData();
+
+    const voucherCode = `TEJAS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const voucherMsg = `🎉 *TEJAS GRID VOUCHER CONFIRMATION*\n\nCongratulations *${currentUser.name}*!\nYou successfully redeemed *"${reward.name}"* for ${reward.pointsCost} Karma Points.\n\n🎟️ *Voucher Code:* ${voucherCode}\n📍 *Redeem Location:* Central Campus Cafeteria / Academic Admin\n💰 *Remaining Karma:* ${updatedBalance} KP\n\n⚡ _Thank you for reducing electricity load during Green Hours to keep TEJAS GRID balanced!_`;
 
     try {
-      // 1. Dispatch real WhatsApp message via Baileys gateway (:5001)
+      // 4. Dispatch real WhatsApp message via Baileys gateway (:5001)
       const res = await sendWhatsAppMessage(currentUser.phoneNumber, voucherMsg);
 
-      // Check if sent to self (e.g. 918238893551 linked device)
       if (res && res.isSelf) {
-        // WhatsApp silences push alerts for self-messages; open WhatsApp Web/App so user views it immediately
         const cleanNumber = currentUser.cleanNumber || '918238893551';
         const waUrl = `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(voucherMsg)}`;
         window.open(waUrl, '_blank');
-        setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] sent to your WhatsApp (opened in chat).`);
+        setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] sent to your WhatsApp (opened in chat). Balance: ${updatedBalance} KP.`);
       } else {
-        setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] sent directly to your WhatsApp (${currentUser.phoneNumber})!`);
+        setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] sent directly to your WhatsApp (${currentUser.phoneNumber})! Balance: ${updatedBalance} KP.`);
       }
     } catch (e) {
       console.warn('Gateway dispatch failed, opening WhatsApp directly:', e);
       const cleanNumber = currentUser.cleanNumber || '918238893551';
       const waUrl = `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(voucherMsg)}`;
       window.open(waUrl, '_blank');
-      setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] pre-filled in WhatsApp.`);
+      setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] pre-filled in WhatsApp. Balance: ${updatedBalance} KP.`);
     }
 
     setTimeout(() => setRedeemSuccess(null), 8000);

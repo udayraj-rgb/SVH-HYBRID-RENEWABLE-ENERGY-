@@ -12,7 +12,7 @@ export const DEFAULT_USERS = {
     cleanNumber: '918238893551',
     hostel: 'Block A (Aryabhata)',
     roomNumber: 'A-302',
-    karmaPoints: 1070,
+    karmaPoints: 1170,
     badge: 'ENERGY CHAMPION',
   },
   student2: {
@@ -24,19 +24,19 @@ export const DEFAULT_USERS = {
     cleanNumber: '919834031115',
     hostel: 'Block A (Aryabhata)',
     roomNumber: 'A-204',
-    karmaPoints: 420,
+    karmaPoints: 520,
     badge: 'GREEN GUARDIAN',
   },
   student3: {
     role: 'STUDENT',
-    name: 'Student Resident',
-    registrationNumber: '24BCE1102',
-    email: 'resident.9031717980@svh.edu',
-    phoneNumber: '+91 90317 17980',
-    cleanNumber: '919031717980',
+    name: 'Priya Patel',
+    registrationNumber: '24BEE1045',
+    email: 'priya.p@campus.tejas.edu',
+    phoneNumber: '+91 98765 43211',
+    cleanNumber: '919876543211',
     hostel: 'Block B (Bhaskara)',
     roomNumber: 'B-118',
-    karmaPoints: 350,
+    karmaPoints: 1130,
     badge: 'ECO WARRIOR',
   },
   operator: {
@@ -79,11 +79,22 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('tejas_auth_user');
   };
 
+  const updateUser = (updatedFields) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, ...updatedFields };
+      try {
+        localStorage.setItem('tejas_auth_user', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  };
+
   const isOperator = () => user?.role === 'OPERATOR';
   const isStudent = () => user?.role === 'STUDENT';
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isOperator, isStudent }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, isOperator, isStudent }}>
       {children}
     </AuthContext.Provider>
   );

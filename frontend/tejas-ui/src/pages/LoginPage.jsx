@@ -184,8 +184,8 @@ export default function LoginPage({ onLoginSuccess }) {
                     }}
                     className="p-2.5 rounded-xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 text-left transition-all hover:border-emerald-500/50 group"
                   >
-                    <div className="text-xs font-bold text-white group-hover:text-emerald-400">Resident</div>
-                    <div className="text-[10px] text-slate-400 font-mono">24BCE1102 (Blk B)</div>
+                    <div className="text-xs font-bold text-white group-hover:text-emerald-400">Priya Patel</div>
+                    <div className="text-[10px] text-slate-400 font-mono">24BEE1045 (Blk B)</div>
                   </button>
                 </div>
               </div>

@@ -138,6 +138,64 @@ public class StudentController {
     }
 
     /**
+     * GET /api/v1/students/reg/{regNo}
+     * Resolves student profile by university registration number.
+     */
+    @GetMapping("/reg/{regNo}")
+    public ResponseEntity<?> getStudentByRegNo(@PathVariable String regNo) {
+        return studentRepository.findByRegistrationNumber(regNo)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * POST /api/v1/students/{id}/redeem
+     * Decrements student's Karma points in PostgreSQL when a voucher is redeemed.
+     */
+    @PostMapping("/{id}/redeem")
+    public ResponseEntity<?> redeemKarmaPoints(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        Optional<Student> opt = studentRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Student student = opt.get();
+        int pointsCost = 0;
+        if (payload.containsKey("pointsCost") && payload.get("pointsCost") != null) {
+            try {
+                pointsCost = Integer.parseInt(payload.get("pointsCost").toString());
+            } catch (Exception ignored) {}
+        }
+        String rewardName = payload.containsKey("rewardName") ? String.valueOf(payload.get("rewardName")) : "Campus Voucher";
+
+        if (student.getKarmaPoints() < pointsCost) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Insufficient Karma points",
+                    "currentBalance", student.getKarmaPoints(),
+                    "requiredPoints", pointsCost
+            ));
+        }
+
+        int previousBalance = student.getKarmaPoints();
+        int newBalance = previousBalance - pointsCost;
+        student.setKarmaPoints(newBalance);
+        Student updated = studentRepository.save(student);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "success");
+        response.put("message", "Voucher redeemed successfully.");
+        response.put("studentId", updated.getId());
+        response.put("registrationNumber", updated.getRegistrationNumber());
+        response.put("rewardName", rewardName);
+        response.put("pointsDeducted", pointsCost);
+        response.put("previousBalance", previousBalance);
+        response.put("currentBalance", newBalance);
+        response.put("student", updated);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * DELETE /api/v1/students/{id}
      * Deletes a student from the database (Facility Operator CRUD).
      */

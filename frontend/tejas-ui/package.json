@@ -12,6 +12,7 @@
   "dependencies": {
     "autoprefixer": "^10.5.4",
     "axios": "^1.20.0",
+    "jspdf": "^4.2.1",
     "lucide-react": "^1.37.0",
     "postcss": "^8.5.26",
     "qrcode": "^1.5.4",

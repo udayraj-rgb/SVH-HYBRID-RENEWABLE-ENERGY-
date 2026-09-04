@@ -40,4 +40,13 @@ public class OrchestratorController {
         DispatchEvent executedEvent = orchestrationService.executeActiveDispatch();
         return ResponseEntity.ok(executedEvent);
     }
+
+    /**
+     * GET /api/v1/orchestrator/executive-analytics
+     * Returns dynamic mathematical & statistical ESG and cost metrics.
+     */
+    @GetMapping("/executive-analytics")
+    public ResponseEntity<java.util.Map<String, Object>> getExecutiveAnalytics() {
+        return ResponseEntity.ok(orchestrationService.calculateExecutiveAnalytics());
+    }
 }
