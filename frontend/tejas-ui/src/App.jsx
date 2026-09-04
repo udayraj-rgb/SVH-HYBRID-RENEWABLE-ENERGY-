@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 import FacilityHub from './pages/FacilityHub';
 import PublicKiosk from './pages/PublicKiosk';
 import StudentPortal from './pages/StudentPortal';
@@ -9,10 +10,11 @@ import LoginPage from './pages/LoginPage';
 import DemoToolbar from './components/DemoToolbar';
 import LiveAlertBanner from './components/LiveAlertBanner';
 import ProtectedRoute from './components/ProtectedRoute';
-import { LogOut, Shield, GraduationCap, Zap, Activity, BarChart3, Users, HelpCircle } from 'lucide-react';
+import { LogOut, Shield, GraduationCap, Zap, Activity, BarChart3, Users, Sun, Moon } from 'lucide-react';
 
 function AppContent() {
   const { user, logout, isOperator, isStudent } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,9 +24,9 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Dynamic Role-Based Top Navigation */}
-      <nav className="bg-slate-900 text-white px-6 py-3.5 shadow-md flex flex-wrap justify-between items-center z-30 gap-4">
+      <nav className="bg-slate-900 text-white px-6 py-3.5 shadow-md flex flex-wrap justify-between items-center z-30 gap-4 border-b border-slate-800">
         {/* Brand & VPP Tag */}
         <div className="flex items-center gap-3">
           <Link to={isOperator() ? '/' : '/student'} className="text-xl font-black flex items-center gap-2 tracking-tight">
@@ -48,7 +50,7 @@ function AppContent() {
         </div>
 
         {/* Dynamic Navigation Links Tailored to Role */}
-        <div className="flex items-center gap-2 md:gap-5 text-sm font-semibold">
+        <div className="flex items-center gap-2 md:gap-4 text-sm font-semibold">
           {/* OPERATOR ONLY LINKS */}
           {isOperator() && (
             <>
@@ -131,8 +133,18 @@ function AppContent() {
             </Link>
           )}
 
+          {/* THEME TOGGLE BUTTON (Light / Dark) */}
+          <button
+            onClick={toggleTheme}
+            title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center gap-1.5 text-xs font-bold cursor-pointer"
+          >
+            {isDark ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-blue-400" />}
+            <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
+          </button>
+
           {/* User Profile Info & Logout */}
-          <div className="flex items-center gap-3 pl-3 border-l border-slate-700">
+          <div className="flex items-center gap-2 pl-2 md:pl-3 border-l border-slate-700">
             <div className="hidden lg:block text-right">
               <div className="text-xs font-bold text-white">{user.name}</div>
               <div className="text-[10px] text-slate-400 font-mono">
@@ -200,11 +212,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

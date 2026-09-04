@@ -76,57 +76,64 @@ export default function FacilityHub() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-24">
-      {/* Header */}
+      {/* Top Header */}
       <div className="flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Facility Control Room</h1>
-          <p className="text-slate-500 text-sm">Real-Time Autonomous Campus Virtual Power Plant (VPP)</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Facility Hub</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            SCADA Dispatcher • Microgrid Autonomous Balancing Engine
+          </p>
         </div>
+
         <div className="flex items-center gap-3">
-          <div className="bg-emerald-50 text-emerald-800 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 border border-emerald-200 shadow-sm">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            Telemetry Loop (5s)
-          </div>
+          <span className="text-xs text-slate-400 font-mono">
+            Synced: {lastUpdated.toLocaleTimeString()}
+          </span>
           <button
             onClick={fetchData}
-            title="Refresh immediately"
-            className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 shadow-sm transition"
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 text-xs font-semibold rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition"
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+            Refresh
           </button>
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* Primary KPI Stream */}
       {kpis ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KpiCard
             title="Solar Generation"
-            value={kpis.solar_generation_kw?.toFixed(1) || '0.0'}
+            value={kpis.solar_kw}
             unit="kW"
             icon={Sun}
+            trend={kpis.demo_state === 'DEFICIT_DETECTED' ? '65% Drop (Cloud)' : 'Optimal Yield'}
           />
           <KpiCard
-            title="Wind Generation"
-            value={kpis.wind_generation_kw?.toFixed(1) || '0.0'}
+            title="Wind Yield"
+            value={kpis.wind_kw}
             unit="kW"
             icon={Wind}
+            trend="Nominal Gust"
           />
           <KpiCard
-            title="Campus Load Demand"
-            value={kpis.campus_load_kw?.toFixed(1) || '0.0'}
+            title="Battery Storage"
+            value={`${kpis.battery_soc_pct}%`}
+            unit={`(${kpis.battery_energy_kwh} kWh)`}
+            icon={Battery}
+            trend={kpis.critical_reserve_locked ? '🔒 30% Safety Lock' : 'Online / Floating'}
+          />
+          <KpiCard
+            title="Campus Demand"
+            value={kpis.campus_load_kw}
             unit="kW"
             icon={Zap}
-          />
-          <KpiCard
-            title="BESS Battery SoC"
-            value={kpis.battery_soc_percent?.toFixed(1) || '0.0'}
-            unit="%"
-            icon={Battery}
+            trend={kpis.net_power_kw < 0 ? 'Deficit Active' : 'Self-Sustaining'}
           />
         </div>
       ) : (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-400 animate-pulse">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center text-slate-400 animate-pulse">
           Connecting to live telemetry streams...
         </div>
       )}
@@ -134,14 +141,14 @@ export default function FacilityHub() {
       {/* Main Grid: 24h Predictive Chart + Recommendations */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recharts Predictive AI Curve */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h3 className="font-bold text-lg text-slate-900">24-Hour AI Yield & Load Forecast</h3>
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white">24-Hour AI Yield & Load Forecast</h3>
               <p className="text-xs text-slate-400">Scikit-Learn Random Forest PV Model + Diurnal Campus Load</p>
             </div>
             {forecastSummary && (
-              <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 rounded-lg text-slate-600">
+              <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300">
                 Peak Solar: {Math.round(forecastSummary.total_projected_solar_kwh)} kWh
               </span>
             )}
@@ -199,54 +206,54 @@ export default function FacilityHub() {
         <div className="lg:col-span-1 space-y-6">
           <DispatchAlert recommendation={recommendation} onExecuted={fetchData} />
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <h3 className="font-bold text-lg text-slate-900 mb-4">Grid Telemetry State</h3>
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-4">Grid Telemetry State</h3>
             <div className="space-y-3.5 text-sm">
-              <div className="flex justify-between border-b border-slate-100 pb-2.5">
-                <span className="text-slate-500 font-medium">Operating State</span>
+              <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Operating State</span>
                 <span
                   className={`font-bold px-2 py-0.5 rounded text-xs ${
                     kpis?.demo_state === 'DEFICIT_DETECTED'
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-emerald-100 text-emerald-800'
+                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300'
+                      : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
                   }`}
                 >
                   {kpis?.demo_state || 'NORMAL'}
                 </span>
               </div>
 
-              <div className="flex justify-between border-b border-slate-100 pb-2.5">
-                <span className="text-slate-500 font-medium">Net Power Flow</span>
+              <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Net Power Flow</span>
                 <span
                   className={`font-semibold ${
-                    (kpis?.net_power_kw || 0) >= 0 ? 'text-emerald-600' : 'text-amber-600'
+                    (kpis?.net_power_kw || 0) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
                   }`}
                 >
                   {kpis?.net_power_kw > 0 ? `+${kpis.net_power_kw}` : kpis?.net_power_kw} kW
                 </span>
               </div>
 
-              <div className="flex justify-between border-b border-slate-100 pb-2.5">
-                <span className="text-slate-500 font-medium">Battery Discharge</span>
-                <span className="font-semibold text-slate-800">{kpis?.battery_discharge_kw || 0.0} kW</span>
+              <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Battery Discharge</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{kpis?.battery_discharge_kw || 0.0} kW</span>
               </div>
 
-              <div className="flex justify-between border-b border-slate-100 pb-2.5">
-                <span className="text-slate-500 font-medium">Lab Reserve Lock</span>
+              <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Lab Reserve Lock</span>
                 <span
                   className={`font-bold text-xs px-2 py-0.5 rounded ${
                     kpis?.critical_reserve_locked
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-slate-100 text-slate-600'
+                      ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+                      : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
                   }`}
                 >
                   {kpis?.critical_reserve_locked ? 'LOCKED (30%)' : 'NORMAL'}
                 </span>
               </div>
 
-              <div className="flex justify-between border-b border-slate-100 pb-2.5">
-                <span className="text-slate-500 font-medium">Avoided Peak Tariff</span>
-                <span className="font-bold text-emerald-600">₹{kpis?.cost_saved_today_inr || 0}</span>
+              <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <span className="text-slate-500 dark:text-slate-400 font-medium">Avoided Peak Tariff</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">₹{kpis?.cost_saved_today_inr || 0}</span>
               </div>
             </div>
           </div>

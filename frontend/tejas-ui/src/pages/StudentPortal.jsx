@@ -12,6 +12,7 @@ import {
 } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import StudentWhatsAppQRModal from '../components/StudentWhatsAppQRModal';
+import KarmaCalculationModal from '../components/KarmaCalculationModal';
 import {
   Award,
   Gift,
@@ -31,6 +32,7 @@ import {
   ExternalLink,
   Shield,
   GraduationCap,
+  Calculator,
 } from 'lucide-react';
 
 export default function StudentPortal() {
@@ -47,6 +49,9 @@ export default function StudentPortal() {
 
   // QR Modal State for Students
   const [showQrModal, setShowQrModal] = useState(false);
+
+  // Karma Formula Explainer Modal State
+  const [showKarmaModal, setShowKarmaModal] = useState(false);
 
   // CRUD State for Facility Operator
   const [showAddModal, setShowAddModal] = useState(false);
@@ -336,6 +341,13 @@ export default function StudentPortal() {
           <p className="opacity-80 text-xs uppercase tracking-widest font-bold mb-1">Karma Points Balance</p>
           <div className="text-6xl font-black text-emerald-300 font-mono tracking-tight">{karmaBalance}</div>
           <p className="text-xs text-emerald-400 mt-1 font-medium">+50 KP per Green Hour load reduction</p>
+          <button
+            onClick={() => setShowKarmaModal(true)}
+            className="mt-3 px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-[11px] font-bold flex items-center gap-1.5 ml-auto transition cursor-pointer"
+          >
+            <Calculator size={12} />
+            <span>How Karma is Calculated</span>
+          </button>
         </div>
       </div>
 
@@ -790,6 +802,13 @@ export default function StudentPortal() {
           </div>
         </div>
       )}
+      {/* ========================================== */}
+      {/* 4. KARMA POINTS CALCULATION EXPLAINER MODAL */}
+      {/* ========================================== */}
+      <KarmaCalculationModal
+        isOpen={showKarmaModal}
+        onClose={() => setShowKarmaModal(false)}
+      />
     </div>
   );
 }
