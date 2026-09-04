@@ -252,6 +252,36 @@ export const getStudents = async () => {
   }
 };
 
+export const createStudent = async (studentData) => {
+  try {
+    const res = await axios.post(`${ORCHESTRATOR_URL}/api/v1/students`, studentData);
+    return res.data;
+  } catch (e) {
+    console.error('Failed to create student:', e);
+    throw e;
+  }
+};
+
+export const updateStudent = async (id, studentData) => {
+  try {
+    const res = await axios.put(`${ORCHESTRATOR_URL}/api/v1/students/${id}`, studentData);
+    return res.data;
+  } catch (e) {
+    console.error('Failed to update student:', e);
+    throw e;
+  }
+};
+
+export const deleteStudent = async (id) => {
+  try {
+    const res = await axios.delete(`${ORCHESTRATOR_URL}/api/v1/students/${id}`);
+    return res.data;
+  } catch (e) {
+    console.error('Failed to delete student:', e);
+    throw e;
+  }
+};
+
 export const sendDirectDeficitAlert = async (phoneNumber = '+918238893551', deficitKw = 180.4) => {
   try {
     const res = await axios.post(
