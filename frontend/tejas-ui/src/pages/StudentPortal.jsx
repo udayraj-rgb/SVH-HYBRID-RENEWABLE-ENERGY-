@@ -7,6 +7,7 @@ import {
   updateStudent,
   deleteStudent,
   sendDirectDeficitAlert,
+  sendWhatsAppMessage,
   getKpis,
 } from '../api/api';
 import { useAuth } from '../context/AuthContext';
@@ -105,11 +106,38 @@ export default function StudentPortal() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleRedeem = (reward) => {
+  const handleRedeem = async (reward) => {
     if (karmaBalance < reward.pointsCost) return;
-    setKarmaBalance((prev) => prev - reward.pointsCost);
-    setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher TEJAS-${Math.floor(1000 + Math.random() * 9000)} sent to ${currentUser.phoneNumber}.`);
-    setTimeout(() => setRedeemSuccess(null), 6000);
+
+    const voucherCode = `TEJAS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newBalance = karmaBalance - reward.pointsCost;
+    setKarmaBalance(newBalance);
+
+    const voucherMsg = `🎉 *TEJAS GRID VOUCHER CONFIRMATION*\n\nCongratulations *${currentUser.name}*!\nYou successfully redeemed *"${reward.name}"* for ${reward.pointsCost} Karma Points.\n\n🎟️ *Voucher Code:* ${voucherCode}\n📍 *Redeem Location:* Central Campus Cafeteria / Academic Admin\n💰 *Remaining Karma:* ${newBalance} KP\n\n⚡ _Thank you for reducing electricity load during Green Hours to keep TEJAS GRID balanced!_`;
+
+    try {
+      // 1. Dispatch real WhatsApp message via Baileys gateway (:5001)
+      const res = await sendWhatsAppMessage(currentUser.phoneNumber, voucherMsg);
+
+      // Check if sent to self (e.g. 918238893551 linked device)
+      if (res && res.isSelf) {
+        // WhatsApp silences push alerts for self-messages; open WhatsApp Web/App so user views it immediately
+        const cleanNumber = currentUser.cleanNumber || '918238893551';
+        const waUrl = `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(voucherMsg)}`;
+        window.open(waUrl, '_blank');
+        setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] sent to your WhatsApp (opened in chat).`);
+      } else {
+        setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] sent directly to your WhatsApp (${currentUser.phoneNumber})!`);
+      }
+    } catch (e) {
+      console.warn('Gateway dispatch failed, opening WhatsApp directly:', e);
+      const cleanNumber = currentUser.cleanNumber || '918238893551';
+      const waUrl = `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(voucherMsg)}`;
+      window.open(waUrl, '_blank');
+      setRedeemSuccess(`🎉 Successfully redeemed "${reward.name}"! Voucher [${voucherCode}] pre-filled in WhatsApp.`);
+    }
+
+    setTimeout(() => setRedeemSuccess(null), 8000);
   };
 
   const handleToggleWhatsapp = async () => {

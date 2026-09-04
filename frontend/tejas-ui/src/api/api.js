@@ -282,6 +282,24 @@ export const deleteStudent = async (id) => {
   }
 };
 
+export const sendWhatsAppMessage = async (phone, message) => {
+  let cleanPhone = String(phone).replace(/[^0-9]/g, '');
+  if (!cleanPhone.startsWith('91') && cleanPhone.length === 10) {
+    cleanPhone = '91' + cleanPhone;
+  }
+
+  try {
+    const res = await axios.post('http://localhost:5001/api/send', {
+      phone: cleanPhone,
+      message: message,
+    });
+    return res.data;
+  } catch (err) {
+    console.warn('Local WhatsApp gateway send failed:', err.message);
+    throw err;
+  }
+};
+
 export const sendDirectDeficitAlert = async (phoneNumber = '+918238893551', deficitKw = 180.4) => {
   try {
     const res = await axios.post(
