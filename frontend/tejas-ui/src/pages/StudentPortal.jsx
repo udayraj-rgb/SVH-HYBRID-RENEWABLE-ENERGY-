@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { getRewards, toggleWhatsappOptIn, getStudents, sendDirectDeficitAlert, getKpis } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 import { Award, Gift, Bell, Check, Sparkles, Send, Users, ShieldCheck, Zap } from 'lucide-react';
 
 export default function StudentPortal() {
+  const { user } = useAuth();
   const [rewards, setRewards] = useState([]);
   const [studentList, setStudentList] = useState([]);
-  const [karmaBalance, setKarmaBalance] = useState(870);
+  const [karmaBalance, setKarmaBalance] = useState(user?.karmaPoints || 870);
   const [whatsappOptIn, setWhatsappOptIn] = useState(true);
   const [alertSuccess, setAlertSuccess] = useState(null);
   const [redeemSuccess, setRedeemSuccess] = useState(null);
@@ -13,13 +15,20 @@ export default function StudentPortal() {
   const [toggling, setToggling] = useState(false);
   const [currentDeficit, setCurrentDeficit] = useState(180.4);
 
-  const currentUser = {
+  const currentUser = user?.role === 'STUDENT' ? {
+    name: user.name,
+    registrationNumber: user.registrationNumber || '24BCE1082',
+    hostel: user.hostel || 'Block A (Aryabhata)',
+    phoneNumber: user.phoneNumber || '+91 82388 93551',
+    cleanNumber: user.cleanNumber || '918238893551',
+    badge: user.badge || 'GREEN GUARDIAN',
+  } : {
     name: 'Udayraj',
     registrationNumber: '24BCE1082',
     hostel: 'Block A (Aryabhata)',
     phoneNumber: '+91 82388 93551',
     cleanNumber: '918238893551',
-    badge: 'GREEN GUARDIAN',
+    badge: 'OPERATOR AUDIT VIEW',
   };
 
   const loadData = async () => {
