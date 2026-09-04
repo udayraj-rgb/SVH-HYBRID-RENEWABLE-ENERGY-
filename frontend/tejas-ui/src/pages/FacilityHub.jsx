@@ -105,31 +105,43 @@ export default function FacilityHub() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KpiCard
             title="Solar Generation"
-            value={kpis.solar_kw}
+            value={
+              kpis.solar_generation_kw !== undefined
+                ? Number(kpis.solar_generation_kw).toFixed(1)
+                : (kpis.solar_kw !== undefined ? Number(kpis.solar_kw).toFixed(1) : '0.0')
+            }
             unit="kW"
             icon={Sun}
             trend={kpis.demo_state === 'DEFICIT_DETECTED' ? '65% Drop (Cloud)' : 'Optimal Yield'}
           />
           <KpiCard
             title="Wind Yield"
-            value={kpis.wind_kw}
+            value={
+              kpis.wind_generation_kw !== undefined
+                ? Number(kpis.wind_generation_kw).toFixed(1)
+                : (kpis.wind_kw !== undefined ? Number(kpis.wind_kw).toFixed(1) : '0.0')
+            }
             unit="kW"
             icon={Wind}
             trend="Nominal Gust"
           />
           <KpiCard
             title="Battery Storage"
-            value={`${kpis.battery_soc_pct}%`}
-            unit={`(${kpis.battery_energy_kwh} kWh)`}
+            value={`${Number(kpis.battery_soc_percent ?? kpis.battery_soc_pct ?? 50).toFixed(1)}%`}
+            unit={`(${Math.round(Number(kpis.battery_soc_percent ?? kpis.battery_soc_pct ?? 50) * 8)} kWh)`}
             icon={Battery}
             trend={kpis.critical_reserve_locked ? '🔒 30% Safety Lock' : 'Online / Floating'}
           />
           <KpiCard
             title="Campus Demand"
-            value={kpis.campus_load_kw}
+            value={
+              kpis.campus_load_kw !== undefined
+                ? Number(kpis.campus_load_kw).toFixed(1)
+                : '550.0'
+            }
             unit="kW"
             icon={Zap}
-            trend={kpis.net_power_kw < 0 ? 'Deficit Active' : 'Self-Sustaining'}
+            trend={(kpis.net_power_kw || 0) < 0 ? 'Deficit Active' : 'Self-Sustaining'}
           />
         </div>
       ) : (
@@ -154,9 +166,9 @@ export default function FacilityHub() {
             )}
           </div>
 
-          <div className="w-full h-72">
+          <div className="w-full h-72 min-h-[290px]">
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={290}>
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                   <defs>
                     <linearGradient id="solarGrad" x1="0" y1="0" x2="0" y2="1">
@@ -168,7 +180,7 @@ export default function FacilityHub() {
                       <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#94a3b8" opacity={0.2} />
                   <XAxis dataKey="hour" stroke="#94a3b8" fontSize={11} />
                   <YAxis stroke="#94a3b8" fontSize={11} />
                   <Tooltip

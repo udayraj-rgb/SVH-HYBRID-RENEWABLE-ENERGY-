@@ -1,6 +1,80 @@
 @import "tailwindcss";
 
-body {
-  background-color: #f8fafc;
+@variant dark (&:where(.dark, .dark *));
+
+/* Base defaults */
+:root {
+  color-scheme: light;
+}
+
+:root.dark,
+:root[data-theme="dark"],
+html.dark {
+  color-scheme: dark;
+}
+
+/* Smooth theme transition */
+html, body {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Light Theme Defaults */
+html:not(.dark) body {
+  background-color: #f1f5f9;
   color: #0f172a;
+}
+
+/* ========================================================= */
+/* BULLETPROOF DARK MODE CSS OVERRIDES                       */
+/* ========================================================= */
+html.dark body {
+  background-color: #020617 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bg-white {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bg-slate-50 {
+  background-color: #0b0f19 !important;
+}
+
+html.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark .border-slate-100,
+html.dark .border-slate-200 {
+  border-color: #1e293b !important;
+}
+
+html.dark .text-slate-900 {
+  color: #ffffff !important;
+}
+
+html.dark .text-slate-800 {
+  color: #f1f5f9 !important;
+}
+
+html.dark .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-slate-500 {
+  color: #64748b !important;
+}
+
+html.dark .divide-slate-100 > * {
+  border-color: #1e293b !important;
+}
+
+html.dark .hover\:bg-slate-50\/80:hover {
+  background-color: rgba(30, 41, 59, 0.6) !important;
 }
