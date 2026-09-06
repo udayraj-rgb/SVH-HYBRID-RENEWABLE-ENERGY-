@@ -176,19 +176,6 @@ export default function LoginPage({ onLoginSuccess }) {
           {/* TAB 1: DTE STATE ADMIN (ROLE_GOVT) */}
           {activeTab === 'govt' && (
             <div>
-              <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/40 rounded-xl p-4 mb-6 flex items-start gap-3">
-                <Building2 className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" size={20} />
-                <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1">
-                  <p className="font-bold text-blue-900 dark:text-blue-300">DTE Rajasthan State Administrator:</p>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Statewide authority over all 20 anchor technical campuses, NAAC Criterion 7.1.2 audits, district comparative ranking, and aggregate MW load-shaving summaries.
-                  </p>
-                  <p className="text-blue-700 dark:text-blue-400 font-medium pt-1">
-                    Clearance: Unrestricted Statewide Access (ROLE_GOVT)
-                  </p>
-                </div>
-              </div>
-
               <form onSubmit={(e) => handleLogin(e, govtUser, govtPass, 'ROLE_GOVT')} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
@@ -259,19 +246,6 @@ export default function LoginPage({ onLoginSuccess }) {
           {/* TAB 2: FACILITY OPERATOR (ROLE_OPERATOR) */}
           {activeTab === 'operator' && (
             <div className="space-y-5">
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl p-4 flex items-start gap-3">
-                <Shield className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={20} />
-                <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1">
-                  <p className="font-bold text-amber-900 dark:text-amber-300">SCADA Facility Clearance (Campus Scoped):</p>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Dedicated operator clearance for individual Rajasthan anchor campuses. Each facility features unique PV/wind generation, diurnal demand profiles, and autonomous battery dispatch.
-                  </p>
-                  <p className="text-amber-700 dark:text-amber-400 font-medium pt-1">
-                    Clearance: Assigned Campus Level 4 (ROLE_OPERATOR)
-                  </p>
-                </div>
-              </div>
-
               {/* 1. CAMPUS SELECTOR DROPDOWN (All 20 Rajasthan Anchor Campuses) */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
@@ -403,19 +377,6 @@ export default function LoginPage({ onLoginSuccess }) {
           {/* TAB 3: STUDENT RESIDENT (ROLE_STUDENT) */}
           {activeTab === 'student' && (
             <div className="space-y-5">
-              <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 rounded-xl p-4 flex items-start gap-3">
-                <GraduationCap className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" size={20} />
-                <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1">
-                  <p className="font-bold text-emerald-900 dark:text-emerald-300">Campus Resident Student Access (Campus Scoped):</p>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Live renewable generation mix, hostel energy leaderboard, avoided carbon metrics, bilingual conservation tips, and cafeteria reward redemptions across 20 technical campuses.
-                  </p>
-                  <p className="text-emerald-700 dark:text-emerald-400 font-medium pt-1">
-                    Clearance: Resident Student • Institutional Microgrid & Hostel Scoped
-                  </p>
-                </div>
-              </div>
-
               {/* 1. CAMPUS SELECTOR DROPDOWN (All 20 Rajasthan Anchor Campuses) */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
