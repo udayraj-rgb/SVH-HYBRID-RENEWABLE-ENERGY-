@@ -93,45 +93,9 @@ export default function LoginPage({ onLoginSuccess }) {
       {/* Translucent cinematic overlay for ambient depth and contrast */}
       <div className="fixed inset-0 bg-slate-950/30 dark:bg-slate-950/50 pointer-events-none z-0" />
 
-      {/* Top Government Navigation Header Bar */}
-      <header className="relative z-20 w-full px-4 sm:px-8 py-3 flex items-center justify-between bg-slate-950/60 backdrop-blur-md border-b border-white/15 text-white">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm">
-            <Building2 size={20} />
-          </div>
-          <div>
-            <div className="text-xs sm:text-sm font-black tracking-tight uppercase flex items-center gap-2">
-              <span>Directorate of Technical Education (DTE)</span>
-              <span className="hidden md:inline-block text-[10px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30">
-                GOVERNMENT OF RAJASTHAN
-              </span>
-            </div>
-            <div className="text-[10px] sm:text-xs text-slate-300 font-medium">
-              TEJAS GRID VPP 2.0 • Autonomous Clean Energy Microgrid Orchestration
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
-            <Activity size={13} className="animate-pulse text-emerald-400" />
-            <span>20 Campuses Synchronized</span>
-          </div>
-
-          <button
-            onClick={toggleTheme}
-            title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-            className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-sm transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer backdrop-blur-md"
-          >
-            {isDark ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-blue-300" />}
-            <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
-          </button>
-        </div>
-      </header>
-
       {/* Main Content: Centered Glassmorphic Multi-Tenant Authentication Terminal */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 my-auto w-full">
-        {/* Right: Glassmorphic Multi-Tenant Authentication Terminal */}
+        {/* Glassmorphic Multi-Tenant Authentication Terminal */}
         <div className="w-full max-w-lg bg-white/90 dark:bg-slate-950/85 backdrop-blur-2xl rounded-3xl border border-white/60 dark:border-white/15 shadow-2xl shadow-black/50 p-6 sm:p-8 text-slate-900 dark:text-white mx-auto transition-all">
           <div className="mb-6 pb-4 border-b border-slate-200/70 dark:border-white/10 flex items-center justify-between">
             <div>
@@ -144,12 +108,22 @@ export default function LoginPage({ onLoginSuccess }) {
                 <span>Portal Authentication</span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                Select your designated clearance tier
+                Select your designated clearance tier across 20 Campuses
               </p>
             </div>
-            <span className="text-[10px] font-mono font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-md">
-              JWT SECURED
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+                className="p-2 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-white border border-slate-200 dark:border-white/20 shadow-xs transition-all flex items-center gap-1 text-xs font-semibold cursor-pointer"
+              >
+                {isDark ? <Sun size={14} className="text-amber-400" /> : <Moon size={14} className="text-blue-500" />}
+              </button>
+              <span className="text-[10px] font-mono font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-md">
+                JWT SECURED
+              </span>
+            </div>
           </div>
 
           {/* 3 Role Switcher Tabs */}
