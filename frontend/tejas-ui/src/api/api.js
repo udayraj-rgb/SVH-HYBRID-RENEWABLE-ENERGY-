@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCampusById, RAJASTHAN_CAMPUSES } from '../data/campuses';
 
 const ORCHESTRATOR_URL = 'http://localhost:8080';
 const TELEMETRY_URL = 'http://localhost:8000';
@@ -213,32 +214,57 @@ export const executeDispatch = async () => {
   }
 };
 
-export const triggerDemoScenario = async (scenario) => {
+export const triggerDemoScenario = async (scenario, campusId = null) => {
   try {
     if (scenario === 'cloud-cover' || scenario === 'demand-spike') {
       simulatedSocOverride = null;
       const res = await axios.post(`${TELEMETRY_URL}/api/telemetry/simulate-cloud-cover`);
 
-      // Dynamically fetch currently registered students from PostgreSQL database
+      // Determine target campus strictly (explicit campusId, localStorage active campus, or logged-in user campus)
+      let targetCampusId = campusId;
+      if (!targetCampusId) {
+        try {
+          const activeCampusStorage = localStorage.getItem('tejas_active_campus_id');
+          if (activeCampusStorage) {
+            targetCampusId = Number(activeCampusStorage);
+          } else {
+            const savedUser = localStorage.getItem('tejas_auth_user');
+            if (savedUser) {
+              const parsed = JSON.parse(savedUser);
+              if (parsed && parsed.campusId) {
+                targetCampusId = Number(parsed.campusId);
+              }
+            }
+          }
+        } catch (e) {}
+      }
+      if (!targetCampusId) targetCampusId = 1;
+
+      const campusMeta = getCampusById(targetCampusId) || RAJASTHAN_CAMPUSES[0];
+      const campusName = campusMeta?.name || 'Campus Microgrid';
+      const hostelName = campusMeta?.hostels && campusMeta.hostels[0] ? campusMeta.hostels[0].name : 'Campus Hostels';
+
+      // Dynamically fetch registered students STRICTLY for this specific campus from PostgreSQL
       try {
-        const studentRes = await axios.get(`${ORCHESTRATOR_URL}/api/v1/students`);
+        const studentRes = await axios.get(`${ORCHESTRATOR_URL}/api/v1/students?campusId=${targetCampusId}`);
         const currentStudents = Array.isArray(studentRes.data) ? studentRes.data : [];
 
-        // Filter strictly for students who currently exist in the DB and have whatsappOptIn = true
+        // Filter strictly for students belonging to THIS campus who have opted into WhatsApp
         const activePhones = currentStudents
-          .filter((s) => s.whatsappOptIn)
+          .filter((s) => s.whatsappOptIn !== false)
           .map((s) => String(s.phoneNumber || '').replace(/[^0-9]/g, ''))
           .map((p) => (p.startsWith('91') ? p : '91' + p))
           .filter((p) => p.length >= 10);
 
         if (activePhones.length > 0) {
+          const alertMsg = `TEJAS GRID LIVE ALERT: Solar deficit detected at ${campusName}! Green Hour is now ACTIVE in ${hostelName}. Please turn off AC/heaters to earn +50 Karma Points!`;
           await axios.post('http://localhost:5001/api/broadcast', {
             phones: activePhones,
-            message: 'TEJAS GRID LIVE ALERT: Solar deficit of 184.2 kW detected on campus! Green Hour is now ACTIVE in Block A (Aryabhata). Please turn off AC/heaters to earn +50 Karma Points!'
+            message: alertMsg,
           });
         }
       } catch (err) {
-        console.warn('Dynamic WhatsApp broadcast error:', err.message);
+        console.warn('Dynamic campus WhatsApp broadcast error:', err.message);
       }
 
       return res.data;

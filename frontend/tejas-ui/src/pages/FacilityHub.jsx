@@ -83,6 +83,12 @@ export default function FacilityHub() {
     setStompActive(false);
   };
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('tejas_active_campus_id', String(campusId));
+    } catch (e) {}
+  }, [campusId]);
+
   const [kpis, setKpis] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [chartData, setChartData] = useState([]);

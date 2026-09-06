@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Play, CloudRain, Zap, Activity, ShieldAlert, RefreshCw, Check } from 'lucide-react';
 import { triggerDemoScenario } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function DemoToolbar() {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [activeScenario, setActiveScenario] = useState('normal');
   const [toastMsg, setToastMsg] = useState('');
+
+  const campusId = user?.campusId || (localStorage.getItem('tejas_active_campus_id') ? Number(localStorage.getItem('tejas_active_campus_id')) : 1);
 
   const showToast = (msg) => {
     setToastMsg(msg);
@@ -16,10 +20,10 @@ export default function DemoToolbar() {
     setLoading(true);
     setActiveScenario(scenario);
     try {
-      await triggerDemoScenario(scenario);
+      await triggerDemoScenario(scenario, campusId);
       showToast(`${label} Activated! Live state updated.`);
       // Immediately notify open pages to refresh data
-      window.dispatchEvent(new CustomEvent('tejas-data-update', { detail: { scenario } }));
+      window.dispatchEvent(new CustomEvent('tejas-data-update', { detail: { scenario, campusId } }));
     } catch (e) {
       console.error(e);
       showToast(`Failed to trigger: ${e.message}`);
