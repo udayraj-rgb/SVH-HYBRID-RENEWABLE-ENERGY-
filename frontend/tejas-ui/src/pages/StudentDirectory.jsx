@@ -18,6 +18,7 @@ import {
   Radio,
   Zap,
   Filter,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { RAJASTHAN_CAMPUSES, getCampusById } from '../data/campuses';
@@ -46,6 +47,47 @@ export default function StudentDirectory() {
   const [selectedHostelFilter, setSelectedHostelFilter] = useState('ALL');
   const [actionMsg, setActionMsg] = useState(null);
   const [broadcasting, setBroadcasting] = useState(false);
+
+  // WhatsApp Gateway status (port 5001)
+  const [gatewayStatus, setGatewayStatus] = useState({
+    connected: false,
+    user: null,
+    checking: true,
+  });
+
+  // Broadcast modal state
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+  const [broadcastMessage, setBroadcastMessage] = useState(
+    `⚡ TEJAS GRID ALERT: Renewable deficit detected at ${campusInfo.name}! Green Hour is now ACTIVE. Please turn off non-essential appliances to earn +50 Karma Points for your hostel leaderboard!`
+  );
+
+  // Update default broadcast message when campus switches
+  useEffect(() => {
+    setBroadcastMessage(
+      `⚡ TEJAS GRID ALERT: Renewable deficit detected at ${campusInfo.name}! Green Hour is now ACTIVE. Please turn off non-essential appliances to earn +50 Karma Points for your hostel leaderboard!`
+    );
+  }, [campusInfo.name]);
+
+  // Continuously check WhatsApp Gateway status
+  const checkGatewayStatus = async () => {
+    try {
+      const res = await fetch('http://localhost:5001/api/status');
+      const data = await res.json();
+      setGatewayStatus({
+        connected: Boolean(data?.connected),
+        user: data?.user || null,
+        checking: false,
+      });
+    } catch (e) {
+      setGatewayStatus({ connected: false, user: null, checking: false });
+    }
+  };
+
+  useEffect(() => {
+    checkGatewayStatus();
+    const interval = setInterval(checkGatewayStatus, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -206,12 +248,38 @@ export default function StudentDirectory() {
 
   const handleSendSingleAlert = async (phone, name) => {
     try {
-      await sendDirectDeficitAlert(phone, 180.4);
-      setActionMsg({ type: 'success', text: `Dispatched Green Hour deficit alert to ${name} (+${phone}).` });
+      let cleanPhone = String(phone).replace(/[^0-9]/g, '');
+      if (!cleanPhone.startsWith('91') && cleanPhone.length === 10) {
+        cleanPhone = '91' + cleanPhone;
+      }
+      const msg = `⚡ TEJAS GRID ALERT: Solar deficit detected at ${campusInfo.name}! Green Hour is active. Turn off high-wattage appliances for 45 mins to earn +50 Karma Points!`;
+
+      // Try local WhatsApp Gateway on port 5001 first for instant socket delivery
+      try {
+        const res = await fetch('http://localhost:5001/api/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: cleanPhone, message: msg }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        setActionMsg({ type: 'success', text: `Dispatched Green Hour deficit alert directly to WhatsApp of ${name} (+${cleanPhone})!` });
+        return;
+      } catch (gwErr) {
+        // Fallback to Spring Boot / Twilio / System queue
+        await sendDirectDeficitAlert(phone, 180.4);
+        if (gwErr.message && gwErr.message.includes('not linked')) {
+          setActionMsg({ type: 'error', text: `WhatsApp Gateway not linked yet. Dispatched to queue. Open http://localhost:5001 to link WhatsApp.` });
+        } else {
+          setActionMsg({ type: 'success', text: `Dispatched deficit alert to ${name} (+${phone}).` });
+        }
+      }
     } catch (err) {
       setActionMsg({ type: 'error', text: `Failed sending alert: ${err.message}` });
     } finally {
-      setTimeout(() => setActionMsg(null), 5000);
+      setTimeout(() => setActionMsg(null), 6000);
     }
   };
 
@@ -229,21 +297,31 @@ export default function StudentDirectory() {
 
     setBroadcasting(true);
     try {
-      const msg = `TEJAS GRID ALERT: Renewable deficit detected at ${campusInfo.name}! Green Hour is now ACTIVE. Please reduce non-essential room load (+50 Karma Points rewarded).`;
-      await fetch('http://localhost:5001/api/broadcast', {
+      const response = await fetch('http://localhost:5001/api/broadcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phones: validPhones, message: msg }),
+        body: JSON.stringify({ phones: validPhones, message: broadcastMessage }),
       });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        if (response.status === 503 || data.error?.includes('not linked')) {
+          throw new Error('WhatsApp Gateway is not linked yet! Open http://localhost:5001 to link your WhatsApp via QR code or Pairing Code.');
+        }
+        throw new Error(data.error || `WhatsApp Gateway returned HTTP ${response.status}`);
+      }
+
+      setShowBroadcastModal(false);
       setActionMsg({
         type: 'success',
-        text: `Broadcasted Green Hour deficit alert to all ${validPhones.length} enrolled students of ${campusInfo.name}.`,
+        text: `Broadcasted Green Hour alert to WhatsApp of ${data.count || validPhones.length} enrolled student(s) at ${campusInfo.name}!`,
       });
     } catch (err) {
       setActionMsg({ type: 'error', text: `Broadcast failed: ${err.message}` });
     } finally {
       setBroadcasting(false);
-      setTimeout(() => setActionMsg(null), 5000);
+      setTimeout(() => setActionMsg(null), 8000);
     }
   };
 
@@ -297,6 +375,24 @@ export default function StudentDirectory() {
                 <span>Locked to {campusInfo.district} Campus (ROLE_OPERATOR)</span>
               </div>
             )}
+
+            {/* WhatsApp Gateway Quick Link & Status */}
+            <a
+              href="http://localhost:5001"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border shadow-xs transition cursor-pointer ${
+                gatewayStatus.connected
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
+                  : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/60'
+              }`}
+              title="Open WhatsApp Gateway Control Panel (http://localhost:5001)"
+            >
+              <Smartphone size={13} className={gatewayStatus.connected ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'} />
+              <span className="hidden sm:inline">WhatsApp Gateway:</span>
+              <span>{gatewayStatus.connected ? `ONLINE (+${gatewayStatus.user})` : 'Standby (Link QR)'}</span>
+              <ExternalLink size={11} className="opacity-70" />
+            </a>
 
             <button
               onClick={fetchCampusStudents}
@@ -499,10 +595,10 @@ export default function StudentDirectory() {
 
             {/* Broadcast Green Hour Alert Button */}
             <button
-              onClick={handleBroadcastCampusDeficit}
+              onClick={() => setShowBroadcastModal(true)}
               disabled={broadcasting || optedInStudents.length === 0}
               className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer disabled:opacity-50"
-              title="Broadcast deficit alert to all opted-in students of this campus"
+              title="Broadcast deficit alert to registered students on WhatsApp"
             >
               <Radio size={13} className={broadcasting ? 'animate-pulse' : ''} />
               <span>Broadcast Alert ({optedInStudents.length})</span>
@@ -740,6 +836,127 @@ export default function StudentDirectory() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Broadcast Direct WhatsApp Deficit Modal */}
+      {showBroadcastModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 text-slate-900 dark:text-white shadow-2xl relative">
+            <button
+              onClick={() => setShowBroadcastModal(false)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="p-2 bg-amber-500/15 text-amber-600 dark:text-amber-400 rounded-xl">
+                <Radio size={20} />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  Broadcast Direct WhatsApp Deficit Alert
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Target: <strong className="text-slate-700 dark:text-slate-300">{campusInfo.name}</strong> • {optedInStudents.length} Opted-In Students
+                </p>
+              </div>
+            </div>
+
+            {/* Gateway Status Banner inside Modal */}
+            <div
+              className={`p-3.5 rounded-xl border mb-4 text-xs transition ${
+                gatewayStatus.connected
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                  : 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200'
+              }`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full ${
+                      gatewayStatus.connected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500 animate-ping'
+                    }`}
+                  />
+                  <span className="font-bold">
+                    {gatewayStatus.connected
+                      ? `Gateway Online: Connected to +${gatewayStatus.user}`
+                      : 'Gateway Standby: Not Linked to WhatsApp Yet'}
+                  </span>
+                </div>
+                <a
+                  href="http://localhost:5001"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-xs transition"
+                >
+                  <ExternalLink size={12} />
+                  <span>Open Gateway UI</span>
+                </a>
+              </div>
+              {!gatewayStatus.connected && (
+                <p className="mt-2 text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+                  Click <strong>Open Gateway UI</strong> (http://localhost:5001) to link your WhatsApp by scanning the QR code or requesting an 8-digit pairing code. Once linked, broadcasts go directly to students' WhatsApp.
+                </p>
+              )}
+            </div>
+
+            {/* Message input */}
+            <div className="space-y-2 mb-4">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Broadcast Notification Message
+              </label>
+              <textarea
+                rows={4}
+                value={broadcastMessage}
+                onChange={(e) => setBroadcastMessage(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-xs text-slate-900 dark:text-slate-100 font-medium focus:outline-none focus:border-emerald-500 leading-relaxed"
+                placeholder="Enter alert message to broadcast to all students..."
+              />
+              <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400">
+                <span>Direct delivery via WhatsApp socket</span>
+                <span>{optedInStudents.length} student phone numbers loaded</span>
+              </div>
+            </div>
+
+            {/* Recipient phone numbers preview */}
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800 mb-5 max-h-28 overflow-y-auto">
+              <div className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1.5">
+                Recipient Numbers Preview ({optedInStudents.length})
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {optedInStudents.map((s) => (
+                  <span
+                    key={s.id}
+                    className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
+                  >
+                    {s.name.split(' ')[0]}: {s.phoneNumber}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowBroadcastModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleBroadcastCampusDeficit}
+                disabled={broadcasting || optedInStudents.length === 0}
+                className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md shadow-amber-600/20 transition cursor-pointer"
+              >
+                <Radio size={14} className={broadcasting ? 'animate-pulse' : ''} />
+                <span>{broadcasting ? 'Dispatching...' : `Broadcast to ${optedInStudents.length} Students`}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

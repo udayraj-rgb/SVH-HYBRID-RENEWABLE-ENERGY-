@@ -33,6 +33,8 @@ import {
   Calculator,
   Sliders,
   Tv,
+  Smartphone,
+  ExternalLink,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -60,6 +62,7 @@ import {
   getOperatorActiveAdvisories,
   acknowledgeAdvisory,
   getOperatorFinancialSummary,
+  getStudents,
 } from '../api/api';
 import {
   subscribeCampusTelemetry,
@@ -308,6 +311,52 @@ export default function FacilityHub() {
     }
   };
 
+  const handleBroadcastAdvisory = async (advisory) => {
+    try {
+      const studentRes = await getStudents(campusId).catch(() => []);
+      const currentStudents = Array.isArray(studentRes)
+        ? studentRes
+        : (studentRes?.data && Array.isArray(studentRes.data) ? studentRes.data : []);
+
+      const activePhones = currentStudents
+        .filter((s) => s.whatsappOptIn !== false)
+        .map((s) => String(s.phoneNumber || '').replace(/[^0-9]/g, ''))
+        .map((p) => (p.startsWith('91') ? p : '91' + p))
+        .filter((p) => p.length >= 10);
+
+      if (activePhones.length === 0) {
+        setActionMsg({ type: 'error', text: `No WhatsApp-opted-in students found for ${currentCampus.name}.` });
+        setTimeout(() => setActionMsg(null), 5000);
+        return;
+      }
+
+      const alertText = `⚡ TEJAS GRID SCADA ADVISORY: ${advisory.titleEn || advisory.title}! ${advisory.messageEn || advisory.recommendation || advisory.message}. Please reduce room appliance consumption (+50 Karma Points rewarded).`;
+
+      const res = await fetch('http://localhost:5001/api/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phones: activePhones, message: alertText }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (res.status === 503 || data.error?.includes('not linked')) {
+          throw new Error('WhatsApp Gateway is not linked yet! Open http://localhost:5001 to link WhatsApp via QR code.');
+        }
+        throw new Error(data.error || `Gateway returned HTTP ${res.status}`);
+      }
+
+      setActionMsg({
+        type: 'success',
+        text: `Broadcasted advisory directly to WhatsApp of ${data.count || activePhones.length} student(s) at ${currentCampus.name}!`,
+      });
+    } catch (err) {
+      setActionMsg({ type: 'error', text: `Broadcast failed: ${err.message}` });
+    } finally {
+      setTimeout(() => setActionMsg(null), 7000);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-24 font-sans text-slate-900 dark:text-slate-100">
       {/* Top Header */}
@@ -399,6 +448,17 @@ export default function FacilityHub() {
                 <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
                 <span>Refresh</span>
               </button>
+              <a
+                href="http://localhost:5001"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 text-xs font-semibold rounded-xl shadow-sm transition cursor-pointer"
+                title="Open WhatsApp Gateway Dispatcher Control (http://localhost:5001)"
+              >
+                <Smartphone size={13} className="text-emerald-600 dark:text-emerald-400" />
+                <span>WhatsApp Gateway</span>
+                <ExternalLink size={11} className="opacity-70" />
+              </a>
               <Link
                 to="/kiosk"
                 className="flex items-center gap-1.5 px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 text-xs font-semibold rounded-xl shadow-sm transition cursor-pointer"
@@ -751,17 +811,27 @@ export default function FacilityHub() {
                     )}
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between flex-wrap gap-2">
                     <span className="text-[10px] text-slate-400 font-mono">
                       {advisory.timestamp ? new Date(advisory.timestamp).toLocaleTimeString() : ''}
                     </span>
-                    <button
-                      onClick={() => handleAcknowledge(advisory.id)}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-                    >
-                      <CheckCheck size={13} />
-                      <span>Acknowledge</span>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleBroadcastAdvisory(advisory)}
+                        className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                        title="Broadcast this Green Hour advisory to registered students on WhatsApp"
+                      >
+                        <Radio size={13} />
+                        <span>Broadcast WhatsApp</span>
+                      </button>
+                      <button
+                        onClick={() => handleAcknowledge(advisory.id)}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <CheckCheck size={13} />
+                        <span>Acknowledge</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
