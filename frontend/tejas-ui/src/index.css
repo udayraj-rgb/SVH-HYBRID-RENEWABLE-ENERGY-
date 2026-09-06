@@ -58,15 +58,27 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Light Mode Body */
+/* Light Mode Body - Rich, vibrant, light colourful background */
 html:not(.dark) body {
-  background-color: #f8fafc;
+  background: 
+    radial-gradient(circle at 10% 15%, rgba(254, 240, 138, 0.45) 0%, transparent 35%),
+    radial-gradient(circle at 90% 18%, rgba(167, 243, 208, 0.5) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(186, 230, 253, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(254, 215, 170, 0.35) 0%, transparent 35%),
+    radial-gradient(circle at 15% 85%, rgba(199, 210, 254, 0.35) 0%, transparent 40%),
+    linear-gradient(135deg, #f0fdf4 0%, #eff6ff 25%, #fffbeb 55%, #faf5ff 80%, #f0fdfa 100%);
+  background-attachment: fixed;
   color: #0f172a;
 }
 
-/* Dark Mode Body */
+/* Dark Mode Body - Deep obsidian mesh with vibrant cyber glow */
 html.dark body {
-  background-color: #060913;
+  background: 
+    radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 70%, rgba(245, 158, 11, 0.05) 0%, transparent 45%),
+    linear-gradient(180deg, #050811 0%, #090e1a 50%, #060a14 100%);
+  background-attachment: fixed;
   color: #f8fafc;
 }
 
@@ -112,15 +124,17 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 /* BI-DIRECTIONAL THEME UTILITIES (HUMAN-ENGINEERED FINISH) */
 /* ========================================================= */
 
-/* In Light Mode: gracefully adapt dark enterprise containers to executive light mode */
+/* In Light Mode: gracefully adapt containers to frosted glass with light colorful glow */
 html:not(.dark) .bg-slate-900,
 html:not(.dark) .bg-slate-900\/80,
 html:not(.dark) .bg-slate-900\/90,
 html:not(.dark) .bg-slate-900\/95 {
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   color: #0f172a;
-  border-color: #e2e8f0;
-  box-shadow: var(--shadow-card);
+  border-color: rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.05), 0 2px 8px -1px rgba(59, 130, 246, 0.04);
 }
 
 html:not(.dark) .bg-slate-950,
@@ -128,9 +142,11 @@ html:not(.dark) .bg-slate-950\/70,
 html:not(.dark) .bg-slate-950\/80,
 html:not(.dark) .bg-slate-950\/90,
 html:not(.dark) .bg-slate-950\/95 {
-  background-color: #f8fafc;
+  background-color: rgba(248, 250, 252, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: #0f172a;
-  border-color: #e2e8f0;
+  border-color: rgba(226, 232, 240, 0.8);
 }
 
 html:not(.dark) .border-slate-800,
@@ -138,13 +154,13 @@ html:not(.dark) .border-slate-800\/80,
 html:not(.dark) .border-slate-700,
 html:not(.dark) .border-slate-700\/60,
 html:not(.dark) .border-slate-700\/80 {
-  border-color: #e2e8f0;
+  border-color: rgba(226, 232, 240, 0.85);
 }
 
 html:not(.dark) .bg-slate-800,
 html:not(.dark) .bg-slate-800\/60,
 html:not(.dark) .bg-slate-800\/80 {
-  background-color: #f1f5f9;
+  background-color: rgba(241, 245, 249, 0.85);
   color: #0f172a;
   border-color: #cbd5e1;
 }
@@ -191,4 +207,29 @@ button.bg-amber-600,
 a.bg-emerald-600,
 a.bg-blue-600 {
   color: #ffffff !important;
+}
+
+/* ========================================================= */
+/* INTERACTIVE UI/UX ENHANCEMENTS                            */
+/* ========================================================= */
+.card-interactive {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+}
+html.dark .card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 18px -2px rgba(16, 185, 129, 0.2);
+}
+
+.interactive-glow-amber:hover {
+  box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.35);
+}
+.interactive-glow-emerald:hover {
+  box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.35);
+}
+.interactive-glow-cyan:hover {
+  box-shadow: 0 0 25px -4px rgba(6, 182, 212, 0.35);
 }

@@ -299,37 +299,66 @@ Technical Standard: IEEE 2030.7 / CEA Baseline v19.0 / RERC Tariff Order 2024-25
         </div>
       </div>
 
+      {/* Interactive Quick-Filter Pills */}
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1 mr-1">
+          <Filter size={12} className="text-blue-500" />
+          Quick Hubs:
+        </span>
+        {[
+          { label: 'All 20 Districts', value: 'All 20 Districts (Statewide Rollup)' },
+          { label: 'Bikaner Hub', value: 'Bikaner' },
+          { label: 'Jodhpur Hub', value: 'Jodhpur' },
+          { label: 'Udaipur Hub', value: 'Udaipur' },
+          { label: 'Kota Hub', value: 'Kota' },
+          { label: 'Jaipur Hub', value: 'Jaipur' },
+          { label: 'Ajmer Hub', value: 'Ajmer' },
+        ].map((hub) => (
+          <button
+            key={hub.label}
+            onClick={() => setSelectedDistrict(hub.value)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              selectedDistrict === hub.value
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 scale-105 border border-blue-500'
+                : 'bg-white/85 dark:bg-slate-900/85 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 backdrop-blur-md'
+            }`}
+          >
+            <span>{hub.label}</span>
+          </button>
+        ))}
+      </div>
+
       {/* Aggregate Metric Banners (NAAC Criterion 7.1.2 & RERC Savings) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Statewide Avoided Utility Cost */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+        <div className="card-interactive bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-white/90 dark:from-emerald-500/10 dark:via-slate-900/95 dark:to-slate-900 p-6 rounded-2xl border border-emerald-300/70 dark:border-emerald-500/30 shadow-sm dark:shadow-xl shadow-emerald-500/5 relative overflow-hidden transition-all group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
               Statewide Avoided Cost (Annual)
             </span>
-            <div className="p-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl">
+            <div className="p-2.5 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/30 group-hover:scale-110 transition-transform">
               <IndianRupee size={20} />
             </div>
           </div>
           <div className="text-3xl font-black text-slate-900 dark:text-white font-mono">
             ₹{(naacData?.statewideAnnualAvoidedCostInr || 48825000).toLocaleString()}
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
             <TrendingUp size={14} />
             <span>RERC Base Rate: ₹7.50 / kWh</span>
           </div>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
             20 Anchor Technical Institutions
           </p>
         </div>
 
         {/* Card 2: Scope 2 Carbon Mitigated */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+        <div className="card-interactive bg-gradient-to-br from-teal-500/15 via-teal-500/5 to-white/90 dark:from-teal-500/10 dark:via-slate-900/95 dark:to-slate-900 p-6 rounded-2xl border border-teal-300/70 dark:border-teal-500/30 shadow-sm dark:shadow-xl shadow-teal-500/5 relative overflow-hidden transition-all group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
               Scope 2 Carbon Displaced
             </span>
-            <div className="p-2 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-xl">
+            <div className="p-2.5 bg-teal-500/20 text-teal-600 dark:text-teal-400 rounded-xl border border-teal-500/30 group-hover:scale-110 transition-transform">
               <Leaf size={20} />
             </div>
           </div>
@@ -337,22 +366,22 @@ Technical Standard: IEEE 2030.7 / CEA Baseline v19.0 / RERC Tariff Order 2024-25
             {(naacData?.statewideAnnualScope2CarbonDisplacedMt || 5338.21).toLocaleString()}
             <span className="text-sm font-sans font-bold text-slate-400 ml-1">MT CO₂e</span>
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-teal-600 dark:text-teal-400">
+          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-teal-700 dark:text-teal-400">
             <TreePine size={14} />
             <span>{(naacData?.totalTreesEquivalent || 245209).toLocaleString()} Trees Equivalent</span>
           </div>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
             CEA Baseline Database v19.0 (0.820 kg/kWh)
           </p>
         </div>
 
         {/* Card 3: Statewide Annual Clean Generation */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+        <div className="card-interactive bg-gradient-to-br from-blue-500/15 via-blue-500/5 to-white/90 dark:from-blue-500/10 dark:via-slate-900/95 dark:to-slate-900 p-6 rounded-2xl border border-blue-300/70 dark:border-blue-500/30 shadow-sm dark:shadow-xl shadow-blue-500/5 relative overflow-hidden transition-all group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
               Statewide Clean Energy
             </span>
-            <div className="p-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl">
+            <div className="p-2.5 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-500/30 group-hover:scale-110 transition-transform">
               <Zap size={20} />
             </div>
           </div>
@@ -360,22 +389,22 @@ Technical Standard: IEEE 2030.7 / CEA Baseline v19.0 / RERC Tariff Order 2024-25
             {((naacData?.statewideAnnualCleanGenerationKwh || 6510000) / 1000000).toFixed(2)}
             <span className="text-sm font-sans font-bold text-slate-400 ml-1">Million kWh</span>
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-blue-600 dark:text-blue-400">
+          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-blue-700 dark:text-blue-400">
             <Layers size={14} />
             <span>{naacData?.statewideTotalCleanCapacityKw || 4935} kW Total Capacity</span>
           </div>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
             Solar: {naacData?.statewideSolarCapacityKw || 3700} kW | Wind: {naacData?.statewideWindCapacityKw || 1235} kW
           </p>
         </div>
 
         {/* Card 4: Peak Demand Reduction */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl relative overflow-hidden transition-colors">
+        <div className="card-interactive bg-gradient-to-br from-amber-500/15 via-amber-500/5 to-white/90 dark:from-amber-500/10 dark:via-slate-900/95 dark:to-slate-900 p-6 rounded-2xl border border-amber-300/70 dark:border-amber-500/30 shadow-sm dark:shadow-xl shadow-amber-500/5 relative overflow-hidden transition-all group">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
               Peak Grid Shaving
             </span>
-            <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl">
+            <div className="p-2.5 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-500/30 group-hover:scale-110 transition-transform">
               <Activity size={20} />
             </div>
           </div>
@@ -383,11 +412,11 @@ Technical Standard: IEEE 2030.7 / CEA Baseline v19.0 / RERC Tariff Order 2024-25
             {optimizationData?.totalPeakDemandReductionMw || 1.66}
             <span className="text-sm font-sans font-bold text-slate-400 ml-1">MW Shaved</span>
           </div>
-          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
+          <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-amber-700 dark:text-amber-400">
             <ShieldCheck size={14} />
             <span>RERC ToD Peak Tariff Avoided</span>
           </div>
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
             BESS Floor: {naacData?.statewideBatteryCapacityKwh || 4150} kWh Statewide
           </p>
         </div>

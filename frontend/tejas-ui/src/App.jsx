@@ -51,9 +51,9 @@ function AppContent() {
   const defaultHome = isGovt() ? '/executive' : (isOperator() ? '/' : '/student');
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-transparent text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Dynamic Role-Based Top Navigation (Enterprise Light & Dark Theme) */}
-      <nav className="bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white px-6 py-3 shadow-xs dark:shadow-md flex flex-wrap justify-between items-center z-30 gap-4 border-b border-slate-200 dark:border-slate-800 backdrop-blur-md transition-colors">
+      <nav className="bg-white/80 dark:bg-slate-900/90 text-slate-900 dark:text-white px-6 py-3 shadow-xs dark:shadow-md flex flex-wrap justify-between items-center z-30 gap-4 border-b border-emerald-500/20 dark:border-slate-800 backdrop-blur-xl transition-colors">
         {/* Brand & VPP Tag (Strictly NO EMOJIS) */}
         <div className="flex items-center gap-3">
           <Link to={defaultHome} className="text-xl font-black flex items-center gap-2 tracking-tight">

@@ -429,8 +429,119 @@ export default function StudentPortal() {
         </div>
       </div>
 
+      {/* Interactive Daily Clean Energy Quests & Instant Karma Rewards */}
+      <div className="card-interactive bg-gradient-to-r from-emerald-500/15 via-amber-500/10 to-teal-500/15 dark:from-emerald-950/40 dark:via-slate-900/90 dark:to-teal-950/40 border border-emerald-500/40 rounded-3xl p-6 shadow-xl backdrop-blur-xl space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2.5 bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-500/30">
+              <Sparkles size={20} className="text-amber-500 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-black text-lg text-slate-900 dark:text-white">
+                  Daily Energy Quests &amp; Instant Karma Rewards
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-slate-950">
+                  EARN POINTS
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Complete daily conservation micro-actions to boost your Karma Points and unlock cafeteria rewards
+              </p>
+            </div>
+          </div>
+
+          <div className="text-xs font-mono font-bold px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-950/80 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300">
+            Available Today: +115 KP
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+          {/* Quest 1 */}
+          <div className="p-4 rounded-2xl bg-white/85 dark:bg-slate-900/80 border border-emerald-300/60 dark:border-emerald-500/30 flex flex-col justify-between shadow-xs space-y-3">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-800 dark:text-emerald-300">
+                  DAILY STREAK
+                </span>
+                <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400">+25 KP</span>
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-2">Green Energy Check-in</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Confirm your hostel room appliances are in energy-saving standby mode.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setKarmaBalance((prev) => prev + 25);
+                setRedeemSuccess('Earned +25 Karma Points for Daily Green Check-in!');
+                setTimeout(() => setRedeemSuccess(null), 4000);
+              }}
+              className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <Check size={13} />
+              <span>Claim +25 KP</span>
+            </button>
+          </div>
+
+          {/* Quest 2 */}
+          <div className="p-4 rounded-2xl bg-white/85 dark:bg-slate-900/80 border border-amber-300/60 dark:border-amber-500/30 flex flex-col justify-between shadow-xs space-y-3">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-800 dark:text-amber-300">
+                  PEAK SHAVING
+                </span>
+                <span className="text-xs font-mono font-black text-amber-600 dark:text-amber-400">+50 KP</span>
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-2">Hostel AC Off (6-9 PM)</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Keep room AC off during Rajasthan DISCOM peak tariff hours.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setKarmaBalance((prev) => prev + 50);
+                setRedeemSuccess('Earned +50 Karma Points for Peak Shaving Pledge!');
+                setTimeout(() => setRedeemSuccess(null), 4000);
+              }}
+              className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <Zap size={13} />
+              <span>Pledge +50 KP</span>
+            </button>
+          </div>
+
+          {/* Quest 3 */}
+          <div className="p-4 rounded-2xl bg-white/85 dark:bg-slate-900/80 border border-purple-300/60 dark:border-purple-500/30 flex flex-col justify-between shadow-xs space-y-3">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-800 dark:text-purple-300">
+                  CAMPUS AUDIT
+                </span>
+                <span className="text-xs font-mono font-black text-purple-600 dark:text-purple-400">+40 KP</span>
+              </div>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white mt-2">Report Campus Wastage</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Report unnecessary corridor lights or open taps to the facility team.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setKarmaBalance((prev) => prev + 40);
+                setRedeemSuccess('Earned +40 Karma Points for verified Energy Audit Report!');
+                setTimeout(() => setRedeemSuccess(null), 4000);
+              }}
+              className="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <Sparkles size={13} />
+              <span>Report &amp; Earn +40 KP</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* STUDENT-FACING INSTANT WHATSAPP OPT-IN CARD */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-emerald-500/30 dark:border-emerald-500/40 shadow-sm dark:shadow-xl flex flex-wrap justify-between items-center gap-6 text-slate-900 dark:text-white transition-colors">
+      <div className="bg-white/90 dark:bg-slate-900/90 p-6 rounded-2xl border border-emerald-500/30 dark:border-emerald-500/40 shadow-sm dark:shadow-xl flex flex-wrap justify-between items-center gap-6 text-slate-900 dark:text-white transition-colors backdrop-blur-xl">
         <div className="flex items-center gap-4">
           <div className="p-3.5 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/30">
             <Smartphone size={28} />
@@ -615,21 +726,29 @@ export default function StudentPortal() {
           {rewards.map((reward) => (
             <div
               key={reward.id}
-              className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+              className="card-interactive bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-white/90 dark:from-purple-500/10 dark:via-slate-900/95 dark:to-slate-900 p-5 rounded-2xl border border-purple-300/60 dark:border-purple-500/30 shadow-sm dark:shadow-xl shadow-purple-500/5 hover:shadow-lg transition-all flex flex-col justify-between group"
             >
               <div>
-                <h3 className="font-bold text-base mb-1.5 text-slate-900 dark:text-white">{reward.name}</h3>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-700 dark:text-purple-300">
+                    CAMPUS PERK
+                  </span>
+                  <Sparkles size={13} className="text-purple-500 opacity-60 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <h3 className="font-extrabold text-base mb-1.5 text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                  {reward.name}
+                </h3>
                 <p className="text-slate-500 dark:text-slate-400 text-xs mb-4 leading-relaxed">{reward.description}</p>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <span className="font-black text-emerald-600 dark:text-emerald-400 text-base">{reward.pointsCost} KP</span>
+              <div className="pt-3 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
+                <span className="font-black text-emerald-600 dark:text-emerald-400 text-base font-mono">{reward.pointsCost} KP</span>
                 <button
                   disabled={karmaBalance < reward.pointsCost}
                   onClick={() => handleRedeem(reward)}
                   className={`px-4 py-2 rounded-xl font-bold text-xs transition-all ${
                     karmaBalance >= reward.pointsCost
-                      ? 'bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white shadow-sm cursor-pointer active:scale-95'
+                      ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-600/25 cursor-pointer active:scale-95'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
                   }`}
                 >
