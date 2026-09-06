@@ -85,16 +85,16 @@ export default function LoginPage({ onLoginSuccess }) {
       style={{
         backgroundImage: "url('/rajasthan_backdrop.png')",
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: 'center top',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',
       }}
     >
       {/* Translucent cinematic overlay for ambient depth and contrast */}
-      <div className="fixed inset-0 bg-slate-950/30 dark:bg-slate-950/50 pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-slate-950/20 dark:bg-slate-950/45 pointer-events-none z-0" />
 
-      {/* Main Content: Centered Glassmorphic Multi-Tenant Authentication Terminal */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 my-auto w-full">
+      {/* Main Content: Centered Glassmorphic Multi-Tenant Authentication Terminal below State Heading */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-12 px-4 sm:px-6 w-full">
         {/* Glassmorphic Multi-Tenant Authentication Terminal */}
         <div className="w-full max-w-lg bg-white/90 dark:bg-slate-950/85 backdrop-blur-2xl rounded-3xl border border-white/60 dark:border-white/15 shadow-2xl shadow-black/50 p-6 sm:p-8 text-slate-900 dark:text-white mx-auto transition-all">
           <div className="mb-6 pb-4 border-b border-slate-200/70 dark:border-white/10 flex items-center justify-between">
