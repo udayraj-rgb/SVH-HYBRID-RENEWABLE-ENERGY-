@@ -80,133 +80,144 @@ export default function LoginPage({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col lg:flex-row relative font-sans transition-colors duration-200">
-      {/* Top Right Theme Toggle */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30">
-        <button
-          onClick={toggleTheme}
-          title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-          className="p-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md transition-all flex items-center gap-2 text-xs font-semibold cursor-pointer"
-        >
-          {isDark ? <Sun size={15} className="text-amber-500" /> : <Moon size={15} className="text-blue-600" />}
-          <span>{isDark ? 'Light' : 'Dark'}</span>
-        </button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/40 via-slate-50 to-orange-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-[#120d09] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200 relative flex flex-col justify-between">
+      {/* Decorative ambient sunrise lighting blurs */}
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-amber-500/10 dark:bg-amber-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* Left Column: Official Heritage & Project Brand Showcase */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white relative overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-800">
-        {/* Subtle decorative glowing background blurs */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Project Branding & Headings */}
-        <div className="relative z-10 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-            <Zap size={13} className="fill-emerald-400 text-emerald-400" />
-            <span>Campus Virtual Power Plant (VPP 2.0)</span>
+      {/* Top Government Navigation Header Bar */}
+      <header className="w-full border-b border-amber-200/60 dark:border-slate-800/80 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-40 transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/25 shadow-sm">
+            <Building2 size={20} />
           </div>
-
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white flex items-center gap-2.5">
-            <span className="text-emerald-400">TEJAS</span> GRID
-          </h1>
-
-          <p className="text-slate-200 text-sm sm:text-base font-semibold">
-            Directorate of Technical Education (DTE), Government of Rajasthan
-          </p>
-
-          <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-lg">
-            Statewide AI Microgrid Orchestration, Peak Deficit Shaving &amp; Renewable SCADA Synchronization across 20 Anchor Technical Institutions.
-          </p>
-        </div>
-
-        {/* Centerpiece Image Showcase */}
-        <div className="relative z-10 my-6 sm:my-8 rounded-2xl overflow-hidden border border-slate-700/70 shadow-2xl bg-slate-950/90 group">
-          <img
-            src="/rajasthan_hero.png"
-            alt="Government of Rajasthan - Clean Energy & Heritage"
-            className="w-full h-auto object-cover block transform group-hover:scale-[1.01] transition-transform duration-500"
-          />
-          <div className="p-3 bg-slate-950/90 border-t border-slate-800 flex items-center justify-between text-xs">
-            <span className="font-semibold text-amber-300 flex items-center gap-1.5">
-              <Sun size={13} /> 4,935 kW Solar &amp; Wind Arrays
-            </span>
-            <span className="font-mono text-emerald-400 font-bold">20 Districts Synchronized</span>
-          </div>
-        </div>
-
-        {/* Live Grid Metrics Bar */}
-        <div className="relative z-10 grid grid-cols-3 gap-3 pt-4 border-t border-slate-800 text-center">
-          <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-700/50">
-            <div className="text-base sm:text-lg font-black font-mono text-emerald-400">20</div>
-            <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Campuses</div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-700/50">
-            <div className="text-base sm:text-lg font-black font-mono text-amber-400">5,338 t</div>
-            <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">CO2 Displaced</div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-slate-800/40 border border-slate-700/50">
-            <div className="text-base sm:text-lg font-black font-mono text-blue-400">A++ Tier</div>
-            <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">NAAC 7.1.2</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Column: Dedicated Authentication Terminal */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-12 bg-slate-50 dark:bg-slate-950 relative">
-        <div className="w-full max-w-md space-y-6">
-          <div className="text-left">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Portal Authentication</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Select your access tier to initialize session and telemetry links</p>
-          </div>
-
-          {/* Role Selection Card */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-xl dark:shadow-2xl transition-colors">
-            {/* 3 Role Switcher Tabs */}
-            <div className="grid grid-cols-3 gap-1.5 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 mb-6">
-            <button
-              onClick={() => { setActiveTab('govt'); setErrorMsg(null); }}
-              className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                activeTab === 'govt'
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-900/60'
-              }`}
-            >
-              <Building2 size={16} />
-              <span>DTE Admin</span>
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('operator'); setErrorMsg(null); }}
-              className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                activeTab === 'operator'
-                  ? 'bg-amber-600 text-white shadow-md shadow-amber-600/25'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-900/60'
-              }`}
-            >
-              <Shield size={16} />
-              <span>Operator</span>
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('student'); setErrorMsg(null); }}
-              className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg font-bold text-xs transition-all cursor-pointer ${
-                activeTab === 'student'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-900/60'
-              }`}
-            >
-              <GraduationCap size={16} />
-              <span>Student</span>
-            </button>
-          </div>
-
-          {/* Error Message */}
-          {errorMsg && (
-            <div className="mb-6 p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl text-xs text-red-700 dark:text-red-300 flex items-center gap-2.5">
-              <AlertCircle size={16} className="text-red-600 dark:text-red-400 shrink-0" />
-              <span>{errorMsg}</span>
+          <div>
+            <div className="text-xs sm:text-sm font-black tracking-tight text-slate-900 dark:text-white uppercase flex items-center gap-2">
+              <span>Directorate of Technical Education (DTE)</span>
+              <span className="hidden md:inline-block text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded border border-amber-300 dark:border-amber-700">
+                RAJASTHAN
+              </span>
             </div>
-          )}
+            <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">
+              Autonomous Microgrid Virtual Power Plant Management System (VPP 2.0)
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
+            <Activity size={13} className="animate-pulse text-emerald-500" />
+            <span>20 Campuses Synchronized</span>
+          </div>
+
+          <button
+            onClick={toggleTheme}
+            title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+          >
+            {isDark ? <Sun size={15} className="text-amber-500" /> : <Moon size={15} className="text-blue-600" />}
+            <span className="hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Unified Centerpiece Portal Console */}
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+        <div className="w-full max-w-4xl bg-white dark:bg-slate-900/95 rounded-3xl overflow-hidden shadow-2xl border border-amber-200/70 dark:border-slate-800 backdrop-blur-xl transition-all">
+          {/* THE OFFICIAL HERO BANNER: Full resolution, uncropped, beautiful integration */}
+          <div className="relative w-full bg-amber-50/50 dark:bg-slate-950 overflow-hidden border-b border-amber-200/60 dark:border-slate-800">
+            <img
+              src="/tejas_official_banner.jpg"
+              alt="Government of Rajasthan - TEJAS GRID (For DTE, Facility Operator and Students)"
+              className="w-full h-auto object-contain block transform hover:scale-[1.008] transition-transform duration-700"
+            />
+          </div>
+
+          {/* Live Microgrid Specification Strip directly below the banner */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-amber-200/60 dark:divide-slate-800 bg-amber-50/70 dark:bg-slate-950/70 border-b border-amber-200/60 dark:border-slate-800 text-center py-2.5 px-2">
+            <div className="px-3 py-1">
+              <div className="text-xs sm:text-sm font-black font-mono text-emerald-600 dark:text-emerald-400">20 Districts</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Anchor Campuses</div>
+            </div>
+            <div className="px-3 py-1">
+              <div className="text-xs sm:text-sm font-black font-mono text-amber-600 dark:text-amber-400">4,935 kW</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Solar &amp; Wind Arrays</div>
+            </div>
+            <div className="px-3 py-1">
+              <div className="text-xs sm:text-sm font-black font-mono text-blue-600 dark:text-blue-400">5,338 t</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">CO2 Displaced / Yr</div>
+            </div>
+            <div className="px-3 py-1">
+              <div className="text-xs sm:text-sm font-black font-mono text-purple-600 dark:text-purple-400">A++ Tier</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">NAAC Criterion 7.1.2</div>
+            </div>
+          </div>
+
+          {/* Authentication Terminal Controls */}
+          <div className="p-6 sm:p-8 lg:p-10">
+            {/* Header linking directly to the banner's text */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+              <div>
+                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <Zap size={18} className="text-amber-500 fill-amber-500" />
+                  <span>Portal Authentication Terminal</span>
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Select your authorized clearance tier to access real-time telemetry and SCADA control
+                </p>
+              </div>
+              <span className="self-start sm:self-auto text-[10px] font-mono font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                <Shield size={12} />
+                JWT MULTI-TENANT RBAC
+              </span>
+            </div>
+
+            {/* 3 Role Switcher Tabs matching the banner: DTE, Operator, Student */}
+            <div className="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 mb-6">
+              <button
+                onClick={() => { setActiveTab('govt'); setErrorMsg(null); }}
+                className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-3 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                  activeTab === 'govt'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-900'
+                }`}
+              >
+                <Building2 size={16} />
+                <span>DTE Admin</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('operator'); setErrorMsg(null); }}
+                className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-3 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                  activeTab === 'operator'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-900'
+                }`}
+              >
+                <Shield size={16} />
+                <span>Facility Operator</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveTab('student'); setErrorMsg(null); }}
+                className={`flex flex-col sm:flex-row items-center justify-center gap-1.5 py-3 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                  activeTab === 'student'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-900'
+                }`}
+              >
+                <GraduationCap size={16} />
+                <span>Student Resident</span>
+              </button>
+            </div>
+
+            {/* Error Message */}
+            {errorMsg && (
+              <div className="mb-6 p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/50 rounded-xl text-xs text-red-700 dark:text-red-300 flex items-center gap-2.5">
+                <AlertCircle size={16} className="text-red-600 dark:text-red-400 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
           {/* TAB 1: DTE STATE ADMIN (ROLE_GOVT) */}
           {activeTab === 'govt' && (
@@ -591,15 +602,19 @@ export default function LoginPage({ onLoginSuccess }) {
               </div>
             </div>
           )}
+          </div>
         </div>
+      </main>
 
-        {/* Footer info */}
-        <div className="text-center mt-6 text-xs text-slate-500">
-          TEJAS GRID VPP 2.0 • Rajasthan Technical Education Microgrid Management System
+      {/* Official Rajasthan DTE Footer */}
+      <footer className="w-full py-4 px-4 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-amber-200/40 dark:border-slate-800/60 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm transition-colors">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>TEJAS GRID VPP 2.0 • Directorate of Technical Education, Government of Rajasthan</span>
+          <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">20 Districts Synchronized • NAAC Criterion 7.1.2 Compliant</span>
         </div>
-      </div>
-    </div>
+      </footer>
     </div>
   );
 }
+
 
