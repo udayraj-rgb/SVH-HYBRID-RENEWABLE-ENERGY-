@@ -81,20 +81,20 @@ export default function LoginPage({ onLoginSuccess }) {
 
   return (
     <div
-      className="min-h-screen w-full relative font-sans flex flex-col justify-between overflow-x-hidden transition-colors duration-200"
+      className="min-h-screen w-full relative font-sans flex flex-col justify-between overflow-x-hidden transition-colors duration-200 bg-slate-950"
       style={{
-        backgroundImage: "url('/tejas_official_banner.jpg')",
+        backgroundImage: "url('/rajasthan_backdrop.png')",
         backgroundSize: 'cover',
-        backgroundPosition: 'center top',
+        backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',
       }}
     >
       {/* Translucent cinematic overlay for ambient depth and contrast */}
-      <div className="fixed inset-0 bg-slate-950/40 dark:bg-slate-950/60 backdrop-blur-[0.5px] pointer-events-none z-0" />
+      <div className="fixed inset-0 bg-slate-950/30 dark:bg-slate-950/50 pointer-events-none z-0" />
 
       {/* Top Government Navigation Header Bar */}
-      <header className="relative z-20 w-full px-4 sm:px-8 py-3 flex items-center justify-between bg-slate-950/50 backdrop-blur-md border-b border-white/15 text-white">
+      <header className="relative z-20 w-full px-4 sm:px-8 py-3 flex items-center justify-between bg-slate-950/60 backdrop-blur-md border-b border-white/15 text-white">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm">
             <Building2 size={20} />
@@ -129,51 +129,16 @@ export default function LoginPage({ onLoginSuccess }) {
         </div>
       </header>
 
-      {/* Main Content: Left Mission Identity & Right Glassmorphic Login Console */}
-      <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between px-6 sm:px-12 lg:px-16 py-8 gap-8 max-w-7xl mx-auto w-full">
-        {/* Left: Statewide Mission Highlights over the dunes */}
-        <div className="hidden lg:flex flex-col justify-between max-w-lg space-y-6">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/70 backdrop-blur-md text-amber-300 border border-amber-500/30 text-xs font-bold uppercase tracking-wider shadow-lg">
-              <Zap size={13} className="fill-amber-400 text-amber-400" />
-              <span>Campus Virtual Power Plant (VPP 2.0)</span>
-            </div>
-
-            <div className="p-6 rounded-3xl bg-slate-950/60 backdrop-blur-xl border border-white/15 shadow-2xl space-y-3">
-              <h1 className="text-3xl xl:text-4xl font-black text-white tracking-tight leading-tight">
-                Statewide Clean Energy Orchestration
-              </h1>
-              <p className="text-sm text-slate-200 leading-relaxed">
-                Real-Time Open-Meteo Solar Irradiance Forecasting, Peak Deficit Shaving &amp; SCADA Synchronization across 20 Anchor Government Engineering Institutions in Rajasthan.
-              </p>
-            </div>
-          </div>
-
-          {/* Live Specification Glass Pills */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-2xl bg-slate-950/65 backdrop-blur-md border border-white/15 text-center">
-              <div className="text-lg font-black font-mono text-emerald-400">20 Districts</div>
-              <div className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">Anchor Campuses</div>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-slate-950/65 backdrop-blur-md border border-white/15 text-center">
-              <div className="text-lg font-black font-mono text-amber-400">4,935 kW</div>
-              <div className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">Solar &amp; Wind Arrays</div>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-slate-950/65 backdrop-blur-md border border-white/15 text-center">
-              <div className="text-lg font-black font-mono text-blue-400">5,338 t</div>
-              <div className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">CO2 Displaced / Yr</div>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-slate-950/65 backdrop-blur-md border border-white/15 text-center">
-              <div className="text-lg font-black font-mono text-purple-400">A++ Tier</div>
-              <div className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">NAAC 7.1.2 Audit</div>
-            </div>
-          </div>
-        </div>
-
+      {/* Main Content: Centered Glassmorphic Multi-Tenant Authentication Terminal */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 my-auto w-full">
         {/* Right: Glassmorphic Multi-Tenant Authentication Terminal */}
-        <div className="w-full max-w-md bg-white/90 dark:bg-slate-950/85 backdrop-blur-2xl rounded-3xl border border-white/60 dark:border-white/15 shadow-2xl shadow-black/50 p-6 sm:p-8 text-slate-900 dark:text-white mx-auto lg:mx-0 transition-all">
+        <div className="w-full max-w-lg bg-white/90 dark:bg-slate-950/85 backdrop-blur-2xl rounded-3xl border border-white/60 dark:border-white/15 shadow-2xl shadow-black/50 p-6 sm:p-8 text-slate-900 dark:text-white mx-auto transition-all">
           <div className="mb-6 pb-4 border-b border-slate-200/70 dark:border-white/10 flex items-center justify-between">
             <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 text-[10px] font-extrabold uppercase tracking-wider mb-1.5 border border-amber-500/30">
+                <Zap size={11} className="fill-amber-500 text-amber-500" />
+                <span>TEJAS GRID VPP 2.0</span>
+              </div>
               <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                 <Shield size={18} className="text-amber-500 dark:text-amber-400" />
                 <span>Portal Authentication</span>
