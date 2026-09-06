@@ -33,10 +33,19 @@ public class HostelBlock {
     @JsonIgnore
     private List<Student> students = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "campus_id", nullable = true)
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hostelBlocks", "users", "telemetryReadings", "hibernateLazyInitializer", "handler"})
+    private Campus campus;
+
     public HostelBlock() {
     }
 
     public HostelBlock(Long id, String name, Integer totalResidents, Double cumulativeSavedKwh, Integer currentKarmaPoints, Integer rank, List<Student> students) {
+        this(id, name, totalResidents, cumulativeSavedKwh, currentKarmaPoints, rank, students, null);
+    }
+
+    public HostelBlock(Long id, String name, Integer totalResidents, Double cumulativeSavedKwh, Integer currentKarmaPoints, Integer rank, List<Student> students, Campus campus) {
         this.id = id;
         this.name = name;
         this.totalResidents = totalResidents;
@@ -44,6 +53,7 @@ public class HostelBlock {
         this.currentKarmaPoints = currentKarmaPoints;
         this.rank = rank;
         this.students = students != null ? students : new ArrayList<>();
+        this.campus = campus;
     }
 
     public static Builder builder() {
@@ -58,6 +68,7 @@ public class HostelBlock {
         private Integer currentKarmaPoints;
         private Integer rank;
         private List<Student> students = new ArrayList<>();
+        private Campus campus;
 
         public Builder id(Long id) { this.id = id; return this; }
         public Builder name(String name) { this.name = name; return this; }
@@ -66,9 +77,10 @@ public class HostelBlock {
         public Builder currentKarmaPoints(Integer currentKarmaPoints) { this.currentKarmaPoints = currentKarmaPoints; return this; }
         public Builder rank(Integer rank) { this.rank = rank; return this; }
         public Builder students(List<Student> students) { this.students = students; return this; }
+        public Builder campus(Campus campus) { this.campus = campus; return this; }
 
         public HostelBlock build() {
-            return new HostelBlock(id, name, totalResidents, cumulativeSavedKwh, currentKarmaPoints, rank, students);
+            return new HostelBlock(id, name, totalResidents, cumulativeSavedKwh, currentKarmaPoints, rank, students, campus);
         }
     }
 
@@ -92,4 +104,7 @@ public class HostelBlock {
 
     public List<Student> getStudents() { return students; }
     public void setStudents(List<Student> students) { this.students = students; }
+
+    public Campus getCampus() { return campus; }
+    public void setCampus(Campus campus) { this.campus = campus; }
 }

@@ -36,29 +36,95 @@ public class StudentController {
     }
 
     /**
-     * GET /api/v1/students
-     * Lists all registered campus students with hostel & registration info.
+     * GET /api/v1/students?campusId={campusId}
+     * Lists registered campus students with hostel & registration info (campus-scoped or all).
      */
     @GetMapping
-    public ResponseEntity<List<Student>> getAllStudents() {
+    public ResponseEntity<List<Student>> getAllStudents(@RequestParam(required = false) Long campusId) {
+        if (campusId != null) {
+            return ResponseEntity.ok(studentRepository.findByCampusId(campusId));
+        }
         return ResponseEntity.ok(studentRepository.findAll());
     }
 
     /**
      * POST /api/v1/students
      * Creates a new student (Facility Operator CRUD).
+    /**
+     * POST /api/v1/students
+     * Creates or updates a student (Facility Operator CRUD / Auto-deduplicating).
      */
     @PostMapping
     public ResponseEntity<?> createStudent(@RequestBody Map<String, Object> payload) {
+        return handleEnrollmentOrCreation(payload, false);
+    }
+
+    /**
+     * POST /api/v1/students/enroll
+     * Enrolls a student directly (via WhatsApp QR scan / self-enrollment).
+     */
+    @PostMapping("/enroll")
+    public ResponseEntity<?> enrollStudent(@RequestBody Map<String, Object> payload) {
+        return handleEnrollmentOrCreation(payload, true);
+    }
+
+    private ResponseEntity<?> handleEnrollmentOrCreation(Map<String, Object> payload, boolean isEnrollment) {
         String name = (String) payload.get("name");
         String registrationNumber = (String) payload.get("registrationNumber");
         String phoneNumber = (String) payload.get("phoneNumber");
         String email = (String) payload.get("email");
 
-        if (name == null || name.isBlank() || registrationNumber == null || registrationNumber.isBlank() || phoneNumber == null || phoneNumber.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Name, Registration Number, and Phone Number are required."));
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Phone number is required."));
         }
 
+        String cleanPhone = phoneNumber.replaceAll("[^0-9]", "");
+        if (!cleanPhone.startsWith("91") && cleanPhone.length() == 10) {
+            cleanPhone = "91" + cleanPhone;
+        }
+
+        // Check if student exists by phone number
+        Optional<Student> existingByPhone = studentRepository.findByPhoneNumber(cleanPhone);
+        if (existingByPhone.isEmpty()) {
+            existingByPhone = studentRepository.findByPhoneNumber(phoneNumber);
+        }
+
+        if (existingByPhone.isPresent()) {
+            Student existing = existingByPhone.get();
+            existing.setWhatsappOptIn(true);
+            if (name != null && !name.isBlank()) existing.setName(name);
+            if (registrationNumber != null && !registrationNumber.isBlank()) existing.setRegistrationNumber(registrationNumber);
+            Student saved = studentRepository.save(existing);
+            return ResponseEntity.ok(Map.of(
+                    "status", "enrolled_existing",
+                    "message", "Student profile updated and WhatsApp opt-in enabled.",
+                    "student", saved
+            ));
+        }
+
+        // Check if student exists by registration number
+        if (registrationNumber != null && !registrationNumber.isBlank()) {
+            Optional<Student> existingByReg = studentRepository.findByRegistrationNumber(registrationNumber);
+            if (existingByReg.isPresent()) {
+                Student existing = existingByReg.get();
+                existing.setWhatsappOptIn(true);
+                existing.setPhoneNumber(cleanPhone);
+                if (name != null && !name.isBlank()) existing.setName(name);
+                Student saved = studentRepository.save(existing);
+                return ResponseEntity.ok(Map.of(
+                        "status", "enrolled_existing",
+                        "message", "Student profile updated with new phone number and WhatsApp opt-in.",
+                        "student", saved
+                ));
+            }
+        }
+
+        if (name == null || name.isBlank()) {
+            name = "Student " + (cleanPhone.length() >= 4 ? cleanPhone.substring(cleanPhone.length() - 4) : cleanPhone);
+        }
+        if (registrationNumber == null || registrationNumber.isBlank()) {
+            registrationNumber = "24BCE" + (cleanPhone.length() >= 4 ? cleanPhone.substring(cleanPhone.length() - 4) : cleanPhone);
+        }
         if (email == null || email.isBlank()) {
             email = registrationNumber.toLowerCase().replaceAll("[^a-z0-9]", "") + "@campus.tejas.edu";
         }
@@ -83,15 +149,20 @@ public class StudentController {
         Student newStudent = Student.builder()
                 .name(name)
                 .registrationNumber(registrationNumber)
-                .phoneNumber(phoneNumber)
+                .phoneNumber(cleanPhone)
                 .email(email)
                 .karmaPoints(karmaPoints)
                 .whatsappOptIn(true)
                 .hostel(hostel)
+                .campus(hostel.getCampus())
                 .build();
 
         Student saved = studentRepository.save(newStudent);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(Map.of(
+                "status", "enrolled_new",
+                "message", "Student successfully enrolled into PostgreSQL Student Directory.",
+                "student", saved
+        ));
     }
 
     /**

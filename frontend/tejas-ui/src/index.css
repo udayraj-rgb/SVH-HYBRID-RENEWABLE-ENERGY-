@@ -2,79 +2,193 @@
 
 @variant dark (&:where(.dark, .dark *));
 
-/* Base defaults */
+/* ========================================================= */
+/* TEJAS GRID - PROFESSIONAL ENTERPRISE DESIGN SYSTEM        */
+/* Cohesive Light & Dark Theme Palette                       */
+/* ========================================================= */
+
 :root {
   color-scheme: light;
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #ffffff;
+  --bg-surface-inset: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.06);
 }
 
 :root.dark,
 :root[data-theme="dark"],
 html.dark {
   color-scheme: dark;
+  --bg-app: #060913;
+  --bg-surface: #0f172a;
+  --bg-surface-elevated: #162033;
+  --bg-surface-inset: #0b0f19;
+  --border-subtle: #1e293b;
+  --border-strong: #334155;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
 }
 
-/* Smooth theme transition */
-html, body {
-  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+/* Global Reset & Typography */
+* {
+  box-sizing: border-box;
 }
 
-/* Light Theme Defaults */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Light Mode Body */
 html:not(.dark) body {
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   color: #0f172a;
 }
 
-/* ========================================================= */
-/* BULLETPROOF DARK MODE CSS OVERRIDES                       */
-/* ========================================================= */
+/* Dark Mode Body */
 html.dark body {
-  background-color: #020617 !important;
-  color: #f8fafc !important;
+  background-color: #060913;
+  color: #f8fafc;
 }
 
-html.dark .bg-white {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
+/* Elegant Minimal Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
 
-html.dark .bg-slate-50 {
-  background-color: #0b0f19 !important;
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
 
-html.dark .bg-slate-100 {
-  background-color: #1e293b !important;
-  color: #f1f5f9 !important;
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
 }
 
-html.dark .border-slate-100,
-html.dark .border-slate-200 {
-  border-color: #1e293b !important;
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-html.dark .text-slate-900 {
+html.dark ::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Smooth selection */
+::selection {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+/* ========================================================= */
+/* BI-DIRECTIONAL THEME UTILITIES (HUMAN-ENGINEERED FINISH) */
+/* ========================================================= */
+
+/* In Light Mode: gracefully adapt dark enterprise containers to executive light mode */
+html:not(.dark) .bg-slate-900,
+html:not(.dark) .bg-slate-900\/80,
+html:not(.dark) .bg-slate-900\/90,
+html:not(.dark) .bg-slate-900\/95 {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+  box-shadow: var(--shadow-card);
+}
+
+html:not(.dark) .bg-slate-950,
+html:not(.dark) .bg-slate-950\/70,
+html:not(.dark) .bg-slate-950\/80,
+html:not(.dark) .bg-slate-950\/90,
+html:not(.dark) .bg-slate-950\/95 {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+html:not(.dark) .border-slate-800,
+html:not(.dark) .border-slate-800\/80,
+html:not(.dark) .border-slate-700,
+html:not(.dark) .border-slate-700\/60,
+html:not(.dark) .border-slate-700\/80 {
+  border-color: #e2e8f0;
+}
+
+html:not(.dark) .bg-slate-800,
+html:not(.dark) .bg-slate-800\/60,
+html:not(.dark) .bg-slate-800\/80 {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+html:not(.dark) .bg-slate-800:hover {
+  background-color: #e2e8f0;
+}
+
+html:not(.dark) .text-white,
+html:not(.dark) .text-slate-100 {
+  color: #0f172a;
+}
+
+html:not(.dark) .text-slate-200 {
+  color: #1e293b;
+}
+
+html:not(.dark) .text-slate-300 {
+  color: #334155;
+}
+
+html:not(.dark) .text-slate-400 {
+  color: #64748b;
+}
+
+/* Ensure buttons maintain high contrast in both themes */
+html:not(.dark) button.bg-slate-900,
+html:not(.dark) button.bg-slate-800 {
+  color: #0f172a;
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+html:not(.dark) button.bg-slate-900:hover,
+html:not(.dark) button.bg-slate-800:hover {
+  background-color: #e2e8f0;
+}
+
+/* Emerald, Amber, Blue buttons always keep crisp white text */
+button.bg-emerald-600,
+button.bg-emerald-700,
+button.bg-blue-600,
+button.bg-amber-600,
+a.bg-emerald-600,
+a.bg-blue-600 {
   color: #ffffff !important;
-}
-
-html.dark .text-slate-800 {
-  color: #f1f5f9 !important;
-}
-
-html.dark .text-slate-700 {
-  color: #e2e8f0 !important;
-}
-
-html.dark .text-slate-600 {
-  color: #94a3b8 !important;
-}
-
-html.dark .text-slate-500 {
-  color: #64748b !important;
-}
-
-html.dark .divide-slate-100 > * {
-  border-color: #1e293b !important;
-}
-
-html.dark .hover\:bg-slate-50\/80:hover {
-  background-color: rgba(30, 41, 59, 0.6) !important;
 }

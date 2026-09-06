@@ -34,10 +34,19 @@ public class Student {
     @JsonIgnoreProperties("students")
     private HostelBlock hostel;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "campus_id", nullable = true)
+    @JsonIgnoreProperties({"students", "users", "telemetryReadings", "hostelBlocks", "hibernateLazyInitializer", "handler"})
+    private Campus campus;
+
     public Student() {
     }
 
     public Student(Long id, String name, String registrationNumber, String phoneNumber, String email, Integer karmaPoints, Boolean whatsappOptIn, HostelBlock hostel) {
+        this(id, name, registrationNumber, phoneNumber, email, karmaPoints, whatsappOptIn, hostel, null);
+    }
+
+    public Student(Long id, String name, String registrationNumber, String phoneNumber, String email, Integer karmaPoints, Boolean whatsappOptIn, HostelBlock hostel, Campus campus) {
         this.id = id;
         this.name = name;
         this.registrationNumber = registrationNumber;
@@ -46,6 +55,7 @@ public class Student {
         this.karmaPoints = karmaPoints;
         this.whatsappOptIn = whatsappOptIn;
         this.hostel = hostel;
+        this.campus = campus;
     }
 
     public static Builder builder() {
@@ -61,6 +71,7 @@ public class Student {
         private Integer karmaPoints;
         private Boolean whatsappOptIn;
         private HostelBlock hostel;
+        private Campus campus;
 
         public Builder id(Long id) { this.id = id; return this; }
         public Builder name(String name) { this.name = name; return this; }
@@ -70,9 +81,10 @@ public class Student {
         public Builder karmaPoints(Integer karmaPoints) { this.karmaPoints = karmaPoints; return this; }
         public Builder whatsappOptIn(Boolean whatsappOptIn) { this.whatsappOptIn = whatsappOptIn; return this; }
         public Builder hostel(HostelBlock hostel) { this.hostel = hostel; return this; }
+        public Builder campus(Campus campus) { this.campus = campus; return this; }
 
         public Student build() {
-            return new Student(id, name, registrationNumber, phoneNumber, email, karmaPoints, whatsappOptIn, hostel);
+            return new Student(id, name, registrationNumber, phoneNumber, email, karmaPoints, whatsappOptIn, hostel, campus);
         }
     }
 
@@ -99,4 +111,7 @@ public class Student {
 
     public HostelBlock getHostel() { return hostel; }
     public void setHostel(HostelBlock hostel) { this.hostel = hostel; }
+
+    public Campus getCampus() { return campus; }
+    public void setCampus(Campus campus) { this.campus = campus; }
 }

@@ -13,6 +13,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     List<Student> findTop10ByOrderByKarmaPointsDesc();
 
+    List<Student> findByCampusId(Long campusId);
+
+    List<Student> findByCampusIdOrderByKarmaPointsDesc(Long campusId);
+
     java.util.Optional<Student> findByRegistrationNumber(String registrationNumber);
 
     java.util.Optional<Student> findByPhoneNumber(String phoneNumber);

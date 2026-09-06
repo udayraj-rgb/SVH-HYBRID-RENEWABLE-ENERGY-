@@ -12,6 +12,8 @@ public interface HostelBlockRepository extends JpaRepository<HostelBlock, Long> 
 
     List<HostelBlock> findAllByOrderByCumulativeSavedKwhDesc();
 
+    List<HostelBlock> findByCampusIdOrderByCumulativeSavedKwhDesc(Long campusId);
+
     @Query("SELECT h FROM HostelBlock h ORDER BY h.cumulativeSavedKwh DESC")
     List<HostelBlock> findTopHostelsByOrderByCumulativeSavedKwhDesc();
 }

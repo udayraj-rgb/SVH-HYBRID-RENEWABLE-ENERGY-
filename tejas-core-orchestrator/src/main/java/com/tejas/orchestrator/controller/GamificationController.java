@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -27,18 +28,32 @@ public class GamificationController {
     }
 
     /**
-     * GET /api/v1/gamification/leaderboard
-     * Returns ranked hostels and student top contributors.
+     * GET /api/v1/gamification/leaderboard?campusId={campusId}
+     * Returns ranked hostels and student top contributors (campus-scoped or statewide).
      */
     @GetMapping("/leaderboard")
-    public ResponseEntity<LeaderboardResponse> getLeaderboard() {
-        List<HostelBlock> rankedHostels = hostelBlockRepository.findAllByOrderByCumulativeSavedKwhDesc();
+    public ResponseEntity<LeaderboardResponse> getLeaderboard(@RequestParam(required = false) Long campusId) {
+        List<HostelBlock> rankedHostels;
+        List<Student> topStudents;
+
+        if (campusId != null) {
+            rankedHostels = hostelBlockRepository.findByCampusIdOrderByCumulativeSavedKwhDesc(campusId);
+            if (rankedHostels == null || rankedHostels.isEmpty()) {
+                rankedHostels = hostelBlockRepository.findAllByOrderByCumulativeSavedKwhDesc();
+            }
+            topStudents = studentRepository.findByCampusIdOrderByKarmaPointsDesc(campusId);
+            if (topStudents == null || topStudents.isEmpty()) {
+                topStudents = studentRepository.findTop10ByOrderByKarmaPointsDesc();
+            }
+        } else {
+            rankedHostels = hostelBlockRepository.findAllByOrderByCumulativeSavedKwhDesc();
+            topStudents = studentRepository.findTop10ByOrderByKarmaPointsDesc();
+        }
+
         // Update rank numbers dynamically
         for (int i = 0; i < rankedHostels.size(); i++) {
             rankedHostels.get(i).setRank(i + 1);
         }
-
-        List<Student> topStudents = studentRepository.findTop10ByOrderByKarmaPointsDesc();
 
         LeaderboardResponse response = LeaderboardResponse.builder()
                 .hostelLeaderboard(rankedHostels)

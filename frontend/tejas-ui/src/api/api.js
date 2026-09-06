@@ -3,6 +3,87 @@ import axios from 'axios';
 const ORCHESTRATOR_URL = 'http://localhost:8080';
 const TELEMETRY_URL = 'http://localhost:8000';
 
+// Configure Bearer JWT token header automatically
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('tejas_jwt_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Authentication API
+export const loginApi = async (username, password) => {
+  const res = await axios.post(`${ORCHESTRATOR_URL}/api/v1/auth/login`, { username, password });
+  return res.data;
+};
+
+// Executive & Governance Endpoints (ROLE_GOVT)
+export const getNaacSummary = async () => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/admin/govt/reports/naac-summary`);
+  return res.data;
+};
+
+export const getCampusRankings = async () => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/admin/govt/reports/campuses-rank`);
+  return res.data;
+};
+
+export const getGovtDistricts = async () => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/admin/govt/districts`);
+  return res.data;
+};
+
+export const getGovtOptimizationSummary = async () => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/admin/govt/optimization-summary`);
+  return res.data;
+};
+
+export const getStatewideActiveAdvisories = async () => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/admin/govt/advisories/active`);
+  return res.data;
+};
+
+export const acknowledgeGovtAdvisory = async (advisoryId) => {
+  const res = await axios.post(`${ORCHESTRATOR_URL}/api/v1/admin/govt/advisories/${advisoryId}/acknowledge`);
+  return res.data;
+};
+
+// Student Endpoints (ROLE_STUDENT, ROLE_OPERATOR, ROLE_GOVT)
+export const getStudentKiosk = async (campusId = 1) => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/student/campuses/${campusId}/kiosk`);
+  return res.data;
+};
+
+// Operator Endpoints (ROLE_OPERATOR, ROLE_GOVT)
+export const getOperatorLiveTelemetry = async (campusId = 1) => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/operator/campuses/${campusId}/telemetry/live`);
+  return res.data;
+};
+
+export const getOperatorDispatchSchedule = async (campusId = 1) => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/operator/campuses/${campusId}/dispatch-schedule`);
+  return res.data;
+};
+
+export const getOperatorActiveAdvisories = async (campusId = 1) => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/operator/campuses/${campusId}/advisories/active`);
+  return res.data;
+};
+
+export const acknowledgeAdvisory = async (campusId = 1, advisoryId) => {
+  const res = await axios.post(`${ORCHESTRATOR_URL}/api/v1/operator/campuses/${campusId}/advisories/${advisoryId}/acknowledge`);
+  return res.data;
+};
+
+export const getOperatorFinancialSummary = async (campusId = 1, period = 'today') => {
+  const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/operator/campuses/${campusId}/financial-summary?period=${period}`);
+  return res.data;
+};
+
 let simulatedSocOverride = null;
 
 export const setSimulatedSoc = (soc) => {
@@ -153,7 +234,7 @@ export const triggerDemoScenario = async (scenario) => {
         if (activePhones.length > 0) {
           await axios.post('http://localhost:5001/api/broadcast', {
             phones: activePhones,
-            message: '⚡ TEJAS GRID LIVE ALERT: Solar deficit of 184.2 kW detected on campus! Green Hour is now ACTIVE in Block A (Aryabhata). Please turn off AC/heaters to earn +50 Karma Points!'
+            message: 'TEJAS GRID LIVE ALERT: Solar deficit of 184.2 kW detected on campus! Green Hour is now ACTIVE in Block A (Aryabhata). Please turn off AC/heaters to earn +50 Karma Points!'
           });
         }
       } catch (err) {
@@ -187,9 +268,12 @@ export const toggleWhatsappOptIn = async (studentId = 1) => {
   }
 };
 
-export const getLeaderboard = async () => {
+export const getLeaderboard = async (campusId = null) => {
   try {
-    const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/gamification/leaderboard`);
+    const url = campusId
+      ? `${ORCHESTRATOR_URL}/api/v1/gamification/leaderboard?campusId=${campusId}`
+      : `${ORCHESTRATOR_URL}/api/v1/gamification/leaderboard`;
+    const res = await axios.get(url);
     const hostels = (res.data.hostelLeaderboard || []).map((h) => ({
       id: h.id,
       name: h.name,
@@ -307,9 +391,12 @@ export const getStudentByRegNo = async (regNo) => {
   }
 };
 
-export const getStudents = async () => {
+export const getStudents = async (campusId = null) => {
   try {
-    const res = await axios.get(`${ORCHESTRATOR_URL}/api/v1/students`);
+    const url = campusId
+      ? `${ORCHESTRATOR_URL}/api/v1/students?campusId=${campusId}`
+      : `${ORCHESTRATOR_URL}/api/v1/students`;
+    const res = await axios.get(url);
     return res.data;
   } catch (e) {
     console.error('Failed to fetch students:', e);
@@ -374,6 +461,27 @@ export const sendDirectDeficitAlert = async (phoneNumber = '+918238893551', defi
   } catch (e) {
     console.error('Failed to trigger direct deficit alert:', e);
     throw e;
+  }
+};
+
+export const enrollStudent = async (studentData) => {
+  try {
+    // Try through WhatsApp gateway first so auto-reply is dispatched
+    const res = await axios.post('http://localhost:5001/api/enroll', studentData);
+    return res.data;
+  } catch (e) {
+    // Fallback directly to Spring Boot Orchestrator
+    const res = await axios.post(`${ORCHESTRATOR_URL}/api/v1/students/enroll`, studentData);
+    return res.data;
+  }
+};
+
+export const getEnrollmentRequests = async () => {
+  try {
+    const res = await axios.get('http://localhost:5001/api/enrollments');
+    return res.data?.enrollments || [];
+  } catch (e) {
+    return [];
   }
 };
 
